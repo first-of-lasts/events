@@ -1,0 +1,32 @@
+from abc import abstractmethod
+from typing import Protocol, Optional
+
+from events.domain.models.user import UserDM
+
+
+class UserSaver(Protocol):
+    @abstractmethod
+    async def save(self, user: UserDM) -> None:
+        """
+        Saves new user.
+        """
+        ...
+
+
+class UserUpdater(Protocol):
+    @abstractmethod
+    async def update(self, email: str, update_data: dict) -> None:
+        """
+        Updates existing user
+        """
+        ...
+
+
+class UserReader(Protocol):
+    @abstractmethod
+    async def get_by_email(self, email: str) -> UserDM:
+        """
+        Retrieves a user by email.
+        Returns None if the user does not exist.
+        """
+        ...
