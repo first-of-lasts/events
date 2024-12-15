@@ -2,6 +2,7 @@ import gettext
 from datetime import timedelta
 from dishka import Provider, Scope, provide, AnyOf
 
+from events.application.interfaces import root_interface
 from events.application.interactors.auth_interactor import \
     PasswordResetInteractor, PasswordResetConfirmInteractor
 from events.infrastructure.adapters.auth.token import JwtTokenProcessor
@@ -35,6 +36,7 @@ class AuthProvider(Provider):
     def register_interactor(
         self,
         config: Config,
+        db_session: root_interface.DBSession,
         auth_gateway: auth_interface.UserSaver,
         token_processor: auth_interface.TokenProcessor,
         email_gateway: email_interface.EmailSender,
@@ -42,6 +44,7 @@ class AuthProvider(Provider):
     ) -> RegisterInteractor:
         return RegisterInteractor(
             config=config,
+            db_session=db_session,
             auth_gateway=auth_gateway,
             token_processor=token_processor,
             email_gateway=email_gateway,

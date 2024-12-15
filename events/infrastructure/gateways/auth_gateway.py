@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select, update
+from sqlalchemy import select, update, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -21,42 +21,20 @@ class AuthGateway(
         self._session = session
         self._token_processor = token_processor
 
-    # async def save(self, user: UserDM) -> None:
-    #     try:
-    #         new_user = User(
-    #             email=user.email,
-    #             username=user.username,
-    #             password=user.password,
-    #         )
-    #         self._session.add(new_user)
-    #         await self._session.commit()
-    #     except IntegrityError as e:
-    #         raise DatabaseIntegrityError(str(e))
+    async def exists_by_email_or_username(self, email: str, username: str) -> bool:
+        query = select(User).where(
+            (User.email == email) | (User.username == username)
+        )
+        result = await self._session.execute(query)
+        return result.scalar() is not None
 
-
-    async def save(self, user: UserDM) -> dict:
-        async with self._session.begin():
-            query = await self._session.execute(
-                select(User)
-                .where(
-                    (User.email == user.email) |
-                    (User.username == user.username)
-                )
-                .with_for_update()
-            )
-            existing_user = query.scalar()
-            if existing_user:
-                if existing_user.email == user.email:
-                    return {"success": False, "reason": "email_exists"}
-                if existing_user.username == user.username:
-                    return {"success": False, "reason": "username_exists"}
-            new_user = User(
-                email=user.email,
-                username=user.username,
-                password=user.password,
-            )
-            self._session.add(new_user)
-            return {'success': True, "reason": ""}
+    async def save(self, user: UserDM):
+        new_user = User(
+            email=user.email,
+            username=user.username,
+            password=user.password,
+        )
+        self._session.add(new_user)
 
     async def update(self, email: str, update_data: dict) -> None:
         stmt = (

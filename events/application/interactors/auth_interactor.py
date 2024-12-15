@@ -1,13 +1,16 @@
 import gettext
 
+from sqlalchemy import text
+
 from events.application.utils.security import verify_password, hash_password
 from events.domain.exceptions.database import DatabaseIntegrityError
 from events.domain.exceptions.user import UserCannotBeCreatedError
 from events.domain.exceptions.access import AuthenticationError
 from events.infrastructure.adapters.auth.token import TokenType
 from events.application.interfaces import email_interface
-from events.application.dto import auth_dto
+from events.application.interfaces import root_interface
 from events.application.interfaces import auth_interface
+from events.application.dto import auth_dto
 from events.domain.models.user import UserDM
 from events.main.config import Config
 
@@ -16,34 +19,34 @@ class RegisterInteractor:
     def __init__(
             self,
             config: Config,
+            db_session: root_interface.DBSession,
             auth_gateway: auth_interface.UserSaver,
             token_processor: auth_interface.TokenProcessor,
             email_gateway: email_interface.EmailSender,
             translations: dict[str, gettext.GNUTranslations],
     ) -> None:
         self._config = config
+        self._db_session = db_session
         self._auth_gateway = auth_gateway
         self._email_gateway = email_gateway
         self._token_processor = token_processor
         self._translations = translations
 
     async def __call__(self, dto: auth_dto.NewUserDTO, language: str) -> None:
-        user = UserDM(
-            email=dto.email,
-            username=dto.username,
-            password=hash_password(dto.password),
-        )
-        status = await self._auth_gateway.save(user)
-        if status["success"] == False:
-            raise UserCannotBeCreatedError(status["reason"])
-        # try:
-        # except DatabaseIntegrityError as e:
-        #     if "email" in e.message:
-        #         raise UserCannotBeCreatedError("Email already exists")
-        #     elif "username" in e.message:
-        #         raise UserCannotBeCreatedError("Username already exists")
-        #     else:
-        #         raise UserCannotBeCreatedError("User creation failed")
+        async with self._db_session:
+            lock_query = f"LOCK TABLE users IN SHARE ROW EXCLUSIVE MODE"
+            await self._db_session.execute(text(lock_query))
+            user = UserDM(
+                email=dto.email,
+                username=dto.username,
+                password=hash_password(dto.password),
+            )
+            if await self._auth_gateway.exists_by_email_or_username(
+                    email=dto.email, username=dto.username
+            ):
+                raise UserCannotBeCreatedError("Email or username already exists")
+            await self._auth_gateway.save(user)
+        #
         token = self._token_processor.create_access_token(dto.email)
         verification_link = f"{self._config.app.base_url}/verify-email?token={token}"
         # sending email

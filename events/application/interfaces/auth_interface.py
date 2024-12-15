@@ -7,7 +7,11 @@ from events.infrastructure.adapters.auth.token import TokenType
 
 class UserSaver(Protocol):
     @abstractmethod
-    async def save(self, user: UserDM) -> dict:
+    async def exists_by_email_or_username(self, email: str, username: str):
+        ...
+
+    @abstractmethod
+    async def save(self, user: UserDM):
         """
         Saves new user.
         """

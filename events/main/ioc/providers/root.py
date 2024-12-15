@@ -48,3 +48,21 @@ class RootProvider(Provider):
             except FileNotFoundError:
                 translations[lang] = gettext.NullTranslations()
         return translations
+
+
+# class SQLAlchemyDBSession:
+#     def __init__(self, session: AsyncSession):
+#         self._session = session
+#
+#     async def acquire_lock(self, table_name: str, lock_mode: str = "SHARE ROW EXCLUSIVE") -> None:
+#         lock_query = f"LOCK TABLE {table_name} IN {lock_mode} MODE"
+#         await self._session.execute(text(lock_query))
+#
+#     async def execute_query(self, query: str, params: dict | None = None) -> None:
+#         await self._session.execute(text(query), params)
+#
+#     async def __aenter__(self):
+#         return self._session
+#
+#     async def __aexit__(self, exc_type, exc_value, traceback):
+#         await self._session.__aexit__(exc_type, exc_value, traceback)
