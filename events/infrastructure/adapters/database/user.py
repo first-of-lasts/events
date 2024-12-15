@@ -13,3 +13,4 @@ class User(Base):
     bio: Mapped[str] = mapped_column(Text, nullable=True)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     is_admin: Mapped[bool]  = mapped_column(Boolean, default=False)
+    # created_events = relationship("Event", back_populates="organizer")

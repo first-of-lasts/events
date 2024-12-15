@@ -4,7 +4,7 @@ from dishka.integrations.fastapi import inject
 
 from events.domain.exceptions.user import UserNotFoundError
 from events.application.interactors import user_interactor
-from events.main.authentication import get_user_email
+from events.presentation.http.dependencies.authentication import get_user_email
 from events.presentation.http.user.schemas import request as request_schemas
 from events.presentation.http.user.schemas import response as response_schemas
 

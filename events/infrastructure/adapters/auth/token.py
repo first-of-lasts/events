@@ -71,7 +71,7 @@ class JwtTokenProcessor:
             to_encode, self.secret, algorithm=self.algorithm,
         )
 
-    def verify_token(self, token: str, token_type: Optional[TokenType] = None) -> Optional[str]:
+    def verify_token(self, token: str, token_type: Optional[TokenType] = None) -> str:
         try:
             payload = jwt.decode(
                 token, self.secret, algorithms=[self.algorithm],

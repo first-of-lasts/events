@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Header
 from dishka.integrations.base import FromDishka
 from dishka.integrations.fastapi import inject
 
@@ -17,7 +17,8 @@ auth_router = APIRouter()
 @inject
 async def register(
         data: request_schemas.RegisterRequest,
-        interactor: FromDishka[auth_interactor.RegisterInteractor]
+        interactor: FromDishka[auth_interactor.RegisterInteractor],
+        language: str = Header(alias="Accept-Language"),
 ):
     try:
         dto = auth_dto.NewUserDTO(
@@ -25,13 +26,14 @@ async def register(
             username=data.username,
             password=data.password,
         )
-        await interactor(dto)
+        await interactor(dto=dto, language=language)
         return {"message": "User created successfully"}
     except UserCannotBeCreatedError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=exc.reason,
         )
+    #
 
 
 @auth_router.get("/verify-email")
@@ -72,9 +74,10 @@ async def login(
 @inject
 async def password_reset(
         data: request_schemas.PasswordResetRequest,
-        interactor: FromDishka[auth_interactor.PasswordResetInteractor]
+        interactor: FromDishka[auth_interactor.PasswordResetInteractor],
+        language: str = Header(alias="Accept-Language"),
 ):
-    await interactor(str(data.email))
+    await interactor(email=str(data.email), language=language)
     return {"message": "Reset link was successfully sent"}
 
 

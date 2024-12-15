@@ -1,10 +1,8 @@
-from datetime import timedelta
+import gettext
 from typing import AsyncIterable
 from dishka import Provider, Scope, provide, AnyOf, from_context
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, \
-    AsyncEngine, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from events.infrastructure.adapters.auth.token import JwtTokenProcessor
 from events.infrastructure.gateways.email_gateway import MockEmailGateway, EmailGateway
 from events.application.interfaces import email_interface
 from events.application.interfaces import root_interface
@@ -31,15 +29,6 @@ class RootProvider(Provider):
                 password=config.smtp.password,
             )
 
-    @provide(scope=Scope.APP)
-    def jwt_token_processor(self, config: Config) -> JwtTokenProcessor:
-        return JwtTokenProcessor(
-            secret=config.app.jwt_secret,
-            access_token_expires=timedelta(minutes=15),
-            refresh_token_expires=timedelta(days=7),
-            algorithm=config.app.jwt_secret_algorithm,
-        )
-
     @provide(scope=Scope.REQUEST)
     async def get_session(self, session_maker: async_sessionmaker[AsyncSession]) -> AsyncIterable[AnyOf[
         AsyncSession,
@@ -47,3 +36,15 @@ class RootProvider(Provider):
     ]]:
         async with session_maker() as session:
             yield session
+
+    @provide(scope=Scope.APP)
+    def translations(self, config: Config) -> dict[str, gettext.GNUTranslations]:
+        translations = {}
+        for lang in config.app.supported_languages:
+            lang_path = f"locale/{lang}/LC_MESSAGES/messages.mo"
+            try:
+                with open(lang_path, "rb") as f:
+                    translations[lang] = gettext.GNUTranslations(f)
+            except FileNotFoundError:
+                translations[lang] = gettext.NullTranslations()
+        return translations

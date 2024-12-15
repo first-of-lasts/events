@@ -4,20 +4,20 @@ from typing import Protocol, Optional
 from events.domain.models.user import UserDM
 
 
-class UserReader(Protocol):
+class UserUpdater(Protocol):
     @abstractmethod
-    async def get_by_email(self, email: str):
+    async def update(self, email: str, update_data: dict) -> UserDM:
         """
-        Retrieves a user by email.
-        Returns None if the user does not exist.
+        Updates existing user
         """
         ...
 
 
-class UserUpdater(Protocol):
+class UserReader(Protocol):
     @abstractmethod
-    async def update(self, email: str, update_data: dict):
+    async def get_by_email(self, email: str) -> Optional[UserDM]:
         """
-        Updates existing user
+        Retrieves a user by email.
+        Returns None if the user does not exist.
         """
         ...

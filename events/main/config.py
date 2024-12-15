@@ -1,7 +1,8 @@
 from os import environ
+from typing import Tuple
+
 from dotenv import load_dotenv
-from pydantic import Field, BaseModel
-from pydantic_settings import BaseSettings
+from pydantic import Field, BaseModel, AnyHttpUrl
 
 from events.infrastructure.adapters.auth.token import Algorithm
 
@@ -9,13 +10,13 @@ from events.infrastructure.adapters.auth.token import Algorithm
 load_dotenv()
 
 
-class AppConfig(BaseSettings):
+class AppConfig(BaseModel):
     name: str = Field(alias="APP_NAME", default="Events")
-    host: str = Field(alias="APP_HOST",default="127.0.0.1")
-    port: int = Field(alias="APP_PORT",default="8000")
     debug: bool = Field(alias="APP_DEBUG", default=True)
+    base_url: AnyHttpUrl = Field(alias="APP_BASE_URL", default="http://localhost:8000")
     jwt_secret: str = Field(alias="APP_JWT_SECRET", default="secret_key")
     jwt_secret_algorithm: Algorithm = Field(alias="APP_JWT_SECRET_ALGORITHM", default="HS256")
+    supported_languages: Tuple[str] = ("uz", "ru", "en")
 
     class Config:
         extra = "ignore"
