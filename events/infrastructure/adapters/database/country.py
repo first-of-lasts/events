@@ -16,7 +16,7 @@ class Country(Base):
         back_populates="country",
         cascade="all, delete-orphan"
     )
-    regions: Mapped[List["Region"]] = relationship("Region", back_populates="country")
+    # regions: Mapped[List["Region"]] = relationship("Region", back_populates="country")
     users: Mapped[List["User"]] = relationship("User", back_populates="country")
 
 

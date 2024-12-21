@@ -3,7 +3,6 @@ import gettext
 from sqlalchemy import text
 
 from events.application.utils.security import verify_password, hash_password
-from events.domain.exceptions.database import DatabaseIntegrityError
 from events.domain.exceptions.user import UserCannotBeCreatedError
 from events.domain.exceptions.access import AuthenticationError
 from events.infrastructure.adapters.auth.token import TokenType
@@ -33,25 +32,26 @@ class RegisterInteractor:
         self._translations = translations
 
     async def __call__(self, dto: auth_dto.NewUserDTO, language: str) -> None:
-        # TODO fix
-        async with self._db_session:
-            lock_query = f"LOCK TABLE users IN SHARE ROW EXCLUSIVE MODE"
-            await self._db_session.execute(text(lock_query))
+        async with self._db_session.begin():
+            await self._auth_gateway.delete_inactive_by_email(dto.email)
+            email_conflicts = await self._auth_gateway.exists_by_email(dto.email)
+            if email_conflicts:
+                raise UserCannotBeCreatedError("Email already exists")
+            username_conflicts = await self._auth_gateway.exists_by_username(dto.username)
+            if username_conflicts:
+                raise UserCannotBeCreatedError("Username already exists")
+
             user = UserDM(
                 email=dto.email,
                 username=dto.username,
                 password=hash_password(dto.password),
             )
-            if await self._auth_gateway.exists_by_email_or_username(
-                    email=dto.email, username=dto.username
-            ):
-                raise UserCannotBeCreatedError("Email or username already exists")
             await self._auth_gateway.save(user)
-        #
-        token = self._token_processor.create_access_token(dto.email)
+        await self._send_verification_email(dto=dto, language=language)
 
+    async def _send_verification_email(self, dto: auth_dto.NewUserDTO, language: str) -> None:
+        token = self._token_processor.create_access_token(dto.email)
         verification_link = f"{self._config.app.base_url}/verify-email?token={token}"
-        # sending email
         if not (language in self._config.app.supported_languages):
             language = "en"
         _ = self._translations[language].gettext
@@ -124,19 +124,21 @@ class PasswordResetInteractor:
     async def __call__(self, email: str, language: str) -> None:
         user = await self._auth_gateway.get_by_email(email)
         if user:
-            token = self._token_processor.create_password_reset_token(email)
-            reset_link = f"{self._config.app.base_url}/reset-password?token={token}"
-            # sending email
-            if not (language in self._config.app.supported_languages):
-                language = "en"
-            _ = self._translations[language].gettext
-            subject = _("Password Reset")
-            body = _(
-                "Hi, visit the link: {reset_link} to reset your password."
-            ).format(reset_link=reset_link)
-            await self._email_gateway.send_email(
-                recipient=email, subject=subject, body=body,
-            )
+            await self._send_reset_email(email=email, language=language)
+
+    async def _send_reset_email(self, email: str, language: str) -> None:
+        token = self._token_processor.create_password_reset_token(email)
+        reset_link = f"{self._config.app.base_url}/reset-password?token={token}"
+        if not (language in self._config.app.supported_languages):
+            language = "en"
+        _ = self._translations[language].gettext
+        subject = _("Password Reset")
+        body = _(
+            "Hi, visit the link: {reset_link} to reset your password."
+        ).format(reset_link=reset_link)
+        await self._email_gateway.send_email(
+            recipient=email, subject=subject, body=body,
+        )
 
 
 class PasswordResetConfirmInteractor:

@@ -16,6 +16,6 @@ class Event(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
     #
     organizer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    organizer: Mapped["User"] = relationship(
-        "User", back_populates="created_events"
-    )
+    # organizer: Mapped["User"] = relationship(
+    #     "User", back_populates="created_events"
+    # )

@@ -7,7 +7,15 @@ from events.infrastructure.adapters.auth.token import TokenType
 
 class UserSaver(Protocol):
     @abstractmethod
-    async def exists_by_email_or_username(self, email: str, username: str):
+    async def delete_inactive_by_email(self, email: str) -> None:
+        ...
+
+    @abstractmethod
+    async def exists_by_email(self, email: str) -> bool:
+        ...
+
+    @abstractmethod
+    async def exists_by_username(self, email: str) -> bool:
         ...
 
     @abstractmethod

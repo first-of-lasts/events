@@ -1,9 +1,8 @@
 from abc import abstractmethod
-from contextlib import AbstractAsyncContextManager
 from typing import Protocol
 
 
-class DBSession(Protocol, ): # AbstractAsyncContextManager):
+class DBSession(Protocol):
     @abstractmethod
     async def commit(self) -> None:
         ...
@@ -13,7 +12,7 @@ class DBSession(Protocol, ): # AbstractAsyncContextManager):
         ...
 
     @abstractmethod
-    async def acquire_lock(self, table_name: str, lock_mode: str) -> None:
+    def begin(self) -> None:
         ...
 
     @abstractmethod

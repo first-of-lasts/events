@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import select, update
+from sqlalchemy import select, update, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from events.domain.exceptions.user import UserNotFoundError
@@ -34,7 +34,9 @@ class UserGateway(
 
     async def get_by_email(self, email: str) -> UserDM:
         result = await self._session.execute(
-            select(User).where(User.email == email)
+            select(User).where(
+                and_(User.email == email, User.is_active == True)
+            )
         )
         user = result.scalars().one_or_none()
         if user:

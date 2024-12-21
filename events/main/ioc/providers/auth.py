@@ -27,7 +27,7 @@ class AuthProvider(Provider):
     def jwt_token_processor(self, config: Config) -> JwtTokenProcessor:
         return JwtTokenProcessor(
             secret=config.app.jwt_secret,
-            access_token_expires=timedelta(minutes=15),
+            access_token_expires=timedelta(hours=1),
             refresh_token_expires=timedelta(days=7),
             algorithm=config.app.jwt_secret_algorithm,
         )
