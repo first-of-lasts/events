@@ -1,8 +1,6 @@
-from datetime import datetime
-from sqlalchemy import MetaData, Integer, DateTime
+from sqlalchemy import MetaData, Integer
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import as_declarative, Mapped, mapped_column
-from sqlalchemy.sql import func
 
 
 def new_session_maker(database_uri) -> async_sessionmaker[AsyncSession]:
@@ -31,13 +29,3 @@ class Base:
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True
     )
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
-
-    # @declared_attr
-    # def __tablename__(cls) -> str:
-    #    return re.sub(r'(?<!^)(?=[A-Z])', '_', cls.__name__).lower()
-
-    # def __repr__(self) -> str:
-    #     pk = inspect(self.__class__).primary_key[0].name
-    #     return f'<{self.__class__.__name__} {getattr(self, pk, id(self))}>'

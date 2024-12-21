@@ -33,6 +33,7 @@ class RegisterInteractor:
         self._translations = translations
 
     async def __call__(self, dto: auth_dto.NewUserDTO, language: str) -> None:
+        # TODO fix
         async with self._db_session:
             lock_query = f"LOCK TABLE users IN SHARE ROW EXCLUSIVE MODE"
             await self._db_session.execute(text(lock_query))
@@ -48,6 +49,7 @@ class RegisterInteractor:
             await self._auth_gateway.save(user)
         #
         token = self._token_processor.create_access_token(dto.email)
+
         verification_link = f"{self._config.app.base_url}/verify-email?token={token}"
         # sending email
         if not (language in self._config.app.supported_languages):
