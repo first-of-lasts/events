@@ -4,7 +4,7 @@ from sqlalchemy import String, Boolean, Integer, ForeignKey, DateTime, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from events.infrastructure.adapters.database.manager import Base
+from events.infrastructure.persistence.manager import Base
 
 
 class User(Base):

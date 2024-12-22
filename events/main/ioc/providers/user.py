@@ -1,3 +1,5 @@
+import gettext
+
 from dishka import Provider, provide, Scope, AnyOf
 
 from events.application.interactors.user_interactor import GetUserInteractor, UpdateUserInteractor
@@ -19,9 +21,11 @@ class UserProvider(Provider):
     def get_user_interactor(
             self,
             user_gateway: user_interface.UserReader,
+            translations: dict[str, gettext.GNUTranslations],
     ) -> GetUserInteractor:
         return GetUserInteractor(
             user_gateway=user_gateway,
+            translations=translations
         )
 
     @provide(scope=Scope.REQUEST)

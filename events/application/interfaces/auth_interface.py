@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Protocol, Optional
 
 from events.domain.models.user import UserDM
-from events.infrastructure.adapters.auth.token import TokenType
+from events.infrastructure.auth.token import TokenType
 
 
 class UserSaver(Protocol):

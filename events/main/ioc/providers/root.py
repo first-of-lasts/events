@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from events.infrastructure.gateways.email_gateway import MockEmailGateway, EmailGateway
 from events.application.interfaces import email_interface
 from events.application.interfaces import root_interface
-from events.infrastructure.adapters.database.manager import new_session_maker
+from events.infrastructure.persistence.manager import new_session_maker
 from events.main.config import Config, get_postgres_uri
 
 

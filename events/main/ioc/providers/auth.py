@@ -5,7 +5,7 @@ from dishka import Provider, Scope, provide, AnyOf
 from events.application.interfaces import root_interface
 from events.application.interactors.auth_interactor import \
     PasswordResetInteractor, PasswordResetConfirmInteractor
-from events.infrastructure.adapters.auth.token import JwtTokenProcessor
+from events.infrastructure.auth.token import JwtTokenProcessor
 from events.application.interfaces import auth_interface
 from events.application.interfaces import email_interface
 from events.infrastructure.gateways.auth_gateway import AuthGateway

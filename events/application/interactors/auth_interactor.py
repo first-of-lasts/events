@@ -1,11 +1,9 @@
 import gettext
 
-from sqlalchemy import text
-
 from events.application.utils.security import verify_password, hash_password
 from events.domain.exceptions.user import UserCannotBeCreatedError
 from events.domain.exceptions.access import AuthenticationError
-from events.infrastructure.adapters.auth.token import TokenType
+from events.infrastructure.auth.token import TokenType
 from events.application.interfaces import email_interface
 from events.application.interfaces import root_interface
 from events.application.interfaces import auth_interface
@@ -33,7 +31,10 @@ class RegisterInteractor:
 
     async def __call__(self, dto: auth_dto.NewUserDTO, language: str) -> None:
         async with self._db_session.begin():
+            # await self._db_session.acquire_lock("users", lock_mode="SHARE ROW EXCLUSIVE")
             await self._auth_gateway.delete_inactive_by_email(dto.email)
+
+            # await self._db_session.acquire_lock("users", lock_mode="ROW SHARE")
             email_conflicts = await self._auth_gateway.exists_by_email(dto.email)
             if email_conflicts:
                 raise UserCannotBeCreatedError("Email already exists")
@@ -50,6 +51,7 @@ class RegisterInteractor:
         await self._send_verification_email(dto=dto, language=language)
 
     async def _send_verification_email(self, dto: auth_dto.NewUserDTO, language: str) -> None:
+        # TODO try - translator = self._translations.get(language, gettext.NullTranslations())
         token = self._token_processor.create_access_token(dto.email)
         verification_link = f"{self._config.app.base_url}/verify-email?token={token}"
         if not (language in self._config.app.supported_languages):
@@ -91,7 +93,7 @@ class LoginInteractor:
 
     async def __call__(self, dto: auth_dto.LoginUserDTO) -> dict:
         user = await self._auth_gateway.get_by_email(dto.email)
-        if user and user.is_verified:
+        if user and user.is_verified and user.is_active:
             if not verify_password(dto.password, user.password):
                 raise AuthenticationError
         else:

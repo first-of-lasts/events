@@ -1,12 +1,20 @@
 import os
 import subprocess
 import polib
+from dotenv import load_dotenv
+
+
+def load_supported_languages() -> list:
+    load_dotenv()
+    supported_languages_str = os.getenv("APP_SUPPORTED_LANGUAGES")
+    supported_languages = [lang.strip() for lang in supported_languages_str.split(",") if lang.strip()]
+    return supported_languages
 
 
 PROJECT_ROOT = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..')
 )
-SUPPORTED_LANGUAGES = ['en', 'ru', 'uz']
+SUPPORTED_LANGUAGES = load_supported_languages()
 LOCALE_DIR = os.path.join(PROJECT_ROOT, "locale")
 TRANSLATION_POT_FILE = os.path.join(LOCALE_DIR, "strings.pot")
 

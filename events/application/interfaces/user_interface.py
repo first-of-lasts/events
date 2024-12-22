@@ -6,7 +6,7 @@ from events.domain.models.user import UserDM
 
 class UserUpdater(Protocol):
     @abstractmethod
-    async def update(self, email: str, update_data: dict) -> UserDM:
+    async def update(self, email: str, update_data: dict) -> None:
         """
         Updates existing user
         """
@@ -15,7 +15,7 @@ class UserUpdater(Protocol):
 
 class UserReader(Protocol):
     @abstractmethod
-    async def get_by_email(self, email: str) -> Optional[UserDM]:
+    async def get_by_email(self, email: str, language: str) -> Optional[UserDM]:
         """
         Retrieves a user by email.
         Returns None if the user does not exist.

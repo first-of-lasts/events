@@ -4,14 +4,13 @@ from sqlalchemy import pool
 from alembic import context
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from events.infrastructure.adapters.database.manager import Base
-from events.main.config import Config, get_postgres_uri
+from events.infrastructure.persistence.config import load_postgres_uri
+from events.infrastructure.persistence.manager import Base
+from events.infrastructure.persistence.models import *
 
 
 config = context.config
-config.set_main_option(
-    "sqlalchemy.url", get_postgres_uri(Config())
-)
+config.set_main_option("sqlalchemy.url", load_postgres_uri())
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 target_metadata = Base.metadata

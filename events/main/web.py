@@ -5,10 +5,10 @@ from dishka import make_async_container
 from dishka.integrations.fastapi import setup_dishka
 
 from events.main.config import Config
-from events.presentation.http.auth.router import auth_router
-from events.presentation.http.user.router import user_router
+from events.presentation.http.routers.auth import auth_router
+from events.presentation.http.routers.user import user_router
+from events.presentation.http.routers.event import event_router
 from events.main.ioc.providers import RootProvider, AuthProvider, UserProvider
-from events.presentation.http.event.router import event_router
 
 
 @asynccontextmanager

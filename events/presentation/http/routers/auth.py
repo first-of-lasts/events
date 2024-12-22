@@ -6,8 +6,7 @@ from events.domain.exceptions.access import AuthenticationError
 from events.domain.exceptions.user import UserCannotBeCreatedError
 from events.application.interactors import auth_interactor
 from events.application.dto import auth_dto
-from events.presentation.http.auth.schemas import request as request_schemas
-from events.presentation.http.auth.schemas import response as response_schemas
+from events.presentation.http.schemas import auth as schemas
 
 
 auth_router = APIRouter()
@@ -16,7 +15,7 @@ auth_router = APIRouter()
 @auth_router.post("/register")
 @inject
 async def register(
-        data: request_schemas.RegisterRequest,
+        data: schemas.Register,
         interactor: FromDishka[auth_interactor.RegisterInteractor],
         language: str = Header(alias="Accept-Language"),
 ):
@@ -33,7 +32,6 @@ async def register(
             status_code=status.HTTP_409_CONFLICT,
             detail=exc.reason,
         )
-    #
 
 
 @auth_router.get("/verify-email")
@@ -54,7 +52,7 @@ async def verify(
 @auth_router.post("/login")
 @inject
 async def login(
-        data: request_schemas.LoginRequest,
+        data: schemas.Login,
         interactor: FromDishka[auth_interactor.LoginInteractor]
 ):
     try:
@@ -73,7 +71,7 @@ async def login(
 @auth_router.post("/password-reset")
 @inject
 async def password_reset(
-        data: request_schemas.PasswordResetRequest,
+        data: schemas.PasswordReset,
         interactor: FromDishka[auth_interactor.PasswordResetInteractor],
         language: str = Header(alias="Accept-Language"),
 ):
@@ -84,7 +82,7 @@ async def password_reset(
 @auth_router.post("/password-reset-confirm")
 @inject
 async def password_reset_confirm(
-        data: request_schemas.PasswordResetConfirmRequest,
+        data: schemas.PasswordResetConfirm,
         interactor: FromDishka[auth_interactor.PasswordResetConfirmInteractor]
 ):
     try:

@@ -1,10 +1,10 @@
 from os import environ
-from typing import Tuple
+from typing import List
 
 from dotenv import load_dotenv
-from pydantic import Field, BaseModel, AnyHttpUrl
+from pydantic import Field, BaseModel, AnyHttpUrl, field_validator
 
-from events.infrastructure.adapters.auth.token import Algorithm
+from events.infrastructure.auth.token import Algorithm
 
 
 load_dotenv()
@@ -16,18 +16,26 @@ class AppConfig(BaseModel):
     base_url: AnyHttpUrl = Field(alias="APP_BASE_URL", default="http://localhost:8000")
     jwt_secret: str = Field(alias="APP_JWT_SECRET", default="secret_key")
     jwt_secret_algorithm: Algorithm = Field(alias="APP_JWT_SECRET_ALGORITHM", default="HS256")
-    supported_languages: Tuple[str] = ("uz", "ru", "en")
+    supported_languages: List[str] = Field(alias="APP_SUPPORTED_LANGUAGES")
+
+    @field_validator("supported_languages", mode="before")
+    def parse_supported_languages(cls, v):
+        if isinstance(v, str):
+            return [lang.strip() for lang in v.split(',') if lang.strip()]
+        elif isinstance(v, list):
+            return v
+        raise ValueError("APP_SUPPORTED_LANGUAGES must be a comma-separated string or a list of strings")
 
     class Config:
         extra = "ignore"
 
 
 class PostgresConfig(BaseModel):
-    host: str = Field(alias="POSTGRES_HOST", default="localhost")
-    port: int = Field(alias="POSTGRES_PORT", default=5432)
-    login: str = Field(alias="POSTGRES_USER", default="postgres")
-    password: str = Field(alias="POSTGRES_PASSWORD", default="postgres")
-    database: str = Field(alias="POSTGRES_DB", default="events")
+    host: str = Field(alias="POSTGRES_HOST")
+    port: int = Field(alias="POSTGRES_PORT")
+    user: str = Field(alias="POSTGRES_USER")
+    password: str = Field(alias="POSTGRES_PASSWORD")
+    database: str = Field(alias="POSTGRES_DATABASE")
 
     class Config:
         extra = "ignore"
@@ -39,10 +47,10 @@ class Config(BaseModel):
 
 
 def get_postgres_uri(config: Config) -> str:
-    return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{db}".format(
+    return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}".format(
         host=config.postgres.host,
         port=config.postgres.port,
-        user=config.postgres.login,
+        user=config.postgres.user,
         password=config.postgres.password,
-        db=config.postgres.database,
+        database=config.postgres.database,
     )

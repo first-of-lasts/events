@@ -1,10 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import String, Text, Boolean, ForeignKey, DateTime, func
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, ForeignKey, DateTime, func
+from sqlalchemy.orm import Mapped, mapped_column
 
-from events.infrastructure.adapters.database.manager import Base
-from events.infrastructure.adapters.database.user import User
+from events.infrastructure.persistence.manager import Base
 
 
 class Event(Base):

@@ -1,12 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 
 from events.domain.exceptions.user import UserNotFoundError
 from events.application.interactors import user_interactor
 from events.presentation.http.dependencies.authentication import get_user_email
-from events.presentation.http.user.schemas import request as request_schemas
-from events.presentation.http.user.schemas import response as response_schemas
+from events.presentation.http.schemas import user as schemas
 
 
 user_router = APIRouter()
@@ -17,14 +16,11 @@ user_router = APIRouter()
 async def get_user(
         interactor: FromDishka[user_interactor.GetUserInteractor],
         user_email: str = Depends(get_user_email),
-) -> response_schemas.UserResponse:
+        language: str = Header(alias="Accept-Language"),
+): # TODO -> schemas.GetUser:
     try:
-        user = await interactor(user_email)
-        return response_schemas.UserResponse(
-           email=user.email,
-           username=user.username,
-           bio=user.bio,
-        )
+        user = await interactor(email=user_email, language=language)
+        return user
     except UserNotFoundError:
         raise HTTPException(
             status_code=404,
@@ -35,17 +31,13 @@ async def get_user(
 @user_router.patch("/me")
 @inject
 async def update_user(
-        updates: request_schemas.UpdateUserRequest,
+        updates: schemas.UpdateUser,
         interactor: FromDishka[user_interactor.UpdateUserInteractor],
         user_email: str = Depends(get_user_email),
-) -> response_schemas.UserResponse:
+):
     try:
-        user = await interactor(user_email, dict(updates))
-        return response_schemas.UserResponse(
-            email=user.email,
-            username=user.username,
-            bio=user.bio,
-        )
+        await interactor(user_email, dict(updates))
+        return {"message": "User updated successfully"}
     except UserNotFoundError:
         raise HTTPException(
             status_code=404,

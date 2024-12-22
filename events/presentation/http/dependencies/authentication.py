@@ -1,7 +1,7 @@
 from fastapi import Request, HTTPException, Depends
 
 from events.domain.exceptions.access import AuthenticationError
-from events.infrastructure.adapters.auth.token import JwtTokenVerifier, TokenType
+from events.infrastructure.auth.token import JwtTokenVerifier, TokenType
 from events.main.config import Config
 
 
