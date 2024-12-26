@@ -1,8 +1,6 @@
-import gettext
-
 from dishka import Provider, provide, Scope, AnyOf
 
-from events.application.interactors.user_interactor import GetUserInteractor, UpdateUserInteractor
+from events.application.interactors import user_interactor
 from events.infrastructure.gateways.user_gateway import UserGateway
 from events.application.interfaces import user_interface
 
@@ -21,18 +19,16 @@ class UserProvider(Provider):
     def get_user_interactor(
             self,
             user_gateway: user_interface.UserReader,
-            #translations: dict[str, gettext.GNUTranslations],
-    ) -> GetUserInteractor:
-        return GetUserInteractor(
+    ) -> user_interactor.GetUserInteractor:
+        return user_interactor.GetUserInteractor(
             user_gateway=user_gateway,
-            #translations=translations
         )
 
     @provide(scope=Scope.REQUEST)
     def update_user_interactor(
             self,
             user_gateway: user_interface.UserUpdater
-    ) -> UpdateUserInteractor:
-        return UpdateUserInteractor(
+    ) -> user_interactor.UpdateUserInteractor:
+        return user_interactor.UpdateUserInteractor(
             user_gateway=user_gateway,
         )

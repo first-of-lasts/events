@@ -1,6 +1,5 @@
-class AuthenticationError(Exception):
-    pass
+from events.domain.exceptions.base import DomainError
 
 
-class AccessDenied(Exception):
-    pass
+class AuthenticationError(DomainError):
+    ...

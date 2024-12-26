@@ -31,3 +31,7 @@ class PasswordReset(BaseModel):
 class PasswordResetConfirm(BaseModel):
     token: str
     new_password: str
+
+
+class CreateTokenPair(BaseModel):
+    refresh_token: str

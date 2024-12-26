@@ -49,7 +49,7 @@ class UserGateway(
                 region=region_dm,
             )
         else:
-            raise UserNotFoundError
+            raise UserNotFoundError("User not found")
 
     async def update(self, email: str, update_data: dict) -> None:
         result = await self._session.execute(
@@ -57,19 +57,19 @@ class UserGateway(
         )
         user = result.scalars().one_or_none()
         if not user:
-            raise UserNotFoundError
+            raise UserNotFoundError("User not found")
         #
-        new_country_id = update_data.get('country_id', user.country_id)
-        new_region_id = update_data.get('region_id', user.region_id)
+        new_country_id = update_data.get("country_id", user.country_id)
+        new_region_id = update_data.get("region_id", user.region_id)
         if new_region_id:
             if not new_country_id:
-                raise InvalidRegionError
+                raise InvalidRegionError("Invalid region")
             region_result = await self._session.execute(
                 select(Region).where(Region.id == new_region_id)
             )
             region = region_result.scalars().one_or_none()
             if (not region) or (region.country_id != new_country_id):
-                raise InvalidRegionError
+                raise InvalidRegionError("Invalid region")
         #
         for key, value in update_data.items():
             if value is not None:

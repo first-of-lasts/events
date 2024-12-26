@@ -1,7 +1,7 @@
 import gettext
 from typing import AsyncIterable
-from dishka import Provider, Scope, provide, AnyOf, from_context
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from dishka import Provider, Scope, provide, AnyOf, from_context
 
 from events.application.interfaces import email_interface
 from events.application.interfaces import root_interface

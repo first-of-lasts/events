@@ -80,7 +80,7 @@ class JwtTokenProcessor:
                 raise AuthenticationError("Invalid token type")
             return payload["sub"]
         except JWTError:
-            raise AuthenticationError
+            raise AuthenticationError("Invalid token")
 
 
 class JwtTokenVerifier:
@@ -101,4 +101,4 @@ class JwtTokenVerifier:
                 raise AuthenticationError("Invalid token type")
             return payload["sub"]
         except JWTError:
-            raise AuthenticationError
+            raise AuthenticationError("Invalid token")

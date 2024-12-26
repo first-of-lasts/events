@@ -88,9 +88,9 @@ class LoginInteractor:
         user = await self._auth_gateway.get_by_email(dto.email)
         if user and user.is_verified and user.is_active:
             if not verify_password(dto.password, user.password):
-                raise AuthenticationError
+                raise AuthenticationError("Invalid credentials")
         else:
-            raise AuthenticationError
+            raise AuthenticationError("Invalid credentials")
 
         access_token = self._token_processor.create_access_token(
             user.email
@@ -150,3 +150,19 @@ class PasswordResetConfirmInteractor:
         )
         hashed_password = hash_password(password)
         await self._auth_gateway.update(email, {"password": hashed_password})
+
+
+class CreateTokenPairInteractor:
+    def __init__(
+            self,
+            token_processor: auth_interface.TokenProcessor,
+    ) -> None:
+        self._token_processor = token_processor
+
+    async def __call__(self, refresh: str) -> dict:
+        email = self._token_processor.verify_token(
+            refresh, token_type=TokenType.REFRESH
+        )
+        access_token = self._token_processor.create_access_token(email)
+        refresh_token = self._token_processor.create_refresh_token(email)
+        return {"access_token": access_token, "refresh_token": refresh_token}

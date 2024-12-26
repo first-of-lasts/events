@@ -3,14 +3,11 @@ from datetime import timedelta
 from dishka import Provider, Scope, provide, AnyOf
 
 from events.application.interfaces import root_interface
-from events.application.interactors.auth_interactor import \
-    PasswordResetInteractor, PasswordResetConfirmInteractor
-from events.infrastructure.auth.token import JwtTokenProcessor
+from events.application.interactors import auth_interactor
 from events.application.interfaces import auth_interface
 from events.application.interfaces import email_interface
+from events.infrastructure.auth.token import JwtTokenProcessor
 from events.infrastructure.gateways.auth_gateway import AuthGateway
-from events.application.interactors.auth_interactor import RegisterInteractor, \
-    VerifyInteractor, LoginInteractor
 from events.main.config import Config
 
 
@@ -41,8 +38,8 @@ class AuthProvider(Provider):
         email_gateway: email_interface.EmailSender,
         token_processor: auth_interface.TokenProcessor,
         translations: dict[str, gettext.GNUTranslations],
-    ) -> RegisterInteractor:
-        return RegisterInteractor(
+    ) -> auth_interactor.RegisterInteractor:
+        return auth_interactor.RegisterInteractor(
             config=config,
             db_session=db_session,
             auth_gateway=auth_gateway,
@@ -56,8 +53,8 @@ class AuthProvider(Provider):
             self,
             auth_gateway: auth_interface.UserUpdater,
             token_processor: auth_interface.TokenProcessor,
-    ) -> VerifyInteractor:
-        return VerifyInteractor(
+    ) -> auth_interactor.VerifyInteractor:
+        return auth_interactor.VerifyInteractor(
             auth_gateway=auth_gateway,
             token_processor=token_processor,
         )
@@ -67,8 +64,8 @@ class AuthProvider(Provider):
             self,
             auth_gateway: auth_interface.UserReader,
             token_processor: auth_interface.TokenProcessor,
-    ) -> LoginInteractor:
-        return LoginInteractor(
+    ) -> auth_interactor.LoginInteractor:
+        return auth_interactor.LoginInteractor(
             auth_gateway=auth_gateway,
             token_processor=token_processor,
         )
@@ -81,8 +78,8 @@ class AuthProvider(Provider):
             email_gateway: email_interface.EmailSender,
             token_processor: auth_interface.TokenProcessor,
             translations: dict[str, gettext.GNUTranslations],
-    ) -> PasswordResetInteractor:
-        return PasswordResetInteractor(
+    ) -> auth_interactor.PasswordResetInteractor:
+        return auth_interactor.PasswordResetInteractor(
             config=config,
             auth_gateway=auth_gateway,
             email_gateway=email_gateway,
@@ -95,8 +92,17 @@ class AuthProvider(Provider):
             self,
             auth_gateway: auth_interface.UserUpdater,
             token_processor: auth_interface.TokenProcessor,
-    ) -> PasswordResetConfirmInteractor:
-        return PasswordResetConfirmInteractor(
+    ) -> auth_interactor.PasswordResetConfirmInteractor:
+        return auth_interactor.PasswordResetConfirmInteractor(
             auth_gateway=auth_gateway,
+            token_processor=token_processor,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def create_token_pair_interactor(
+            self,
+            token_processor: auth_interface.TokenProcessor,
+    ) -> auth_interactor.CreateTokenPairInteractor:
+        return auth_interactor.CreateTokenPairInteractor(
             token_processor=token_processor,
         )

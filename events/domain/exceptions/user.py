@@ -1,8 +1,9 @@
-class UserCannotBeCreatedError(Exception):
-    def __init__(self, reason: str):
-        self.reason = reason
-        super().__init__(reason)
+from events.domain.exceptions.base import DomainError
 
 
-class UserNotFoundError(Exception):
-    pass
+class UserCannotBeCreatedError(DomainError):
+    ...
+
+
+class UserNotFoundError(DomainError):
+    ...
