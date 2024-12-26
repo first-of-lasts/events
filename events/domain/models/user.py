@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from events.domain.models.country import CountryDM
+from events.domain.models.region import RegionDM
 
 
 @dataclass(slots=True)
@@ -14,3 +15,4 @@ class UserDM:
     is_verified: Optional[bool] = None
     is_active: Optional[bool] = None
     country: Optional[CountryDM] = None
+    region: Optional[RegionDM] = None

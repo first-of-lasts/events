@@ -9,10 +9,8 @@ class GetUserInteractor:
     def __init__(
             self,
             user_gateway: user_interface.UserReader,
-            translations: dict[str, gettext.GNUTranslations],
     ) -> None:
         self._user_gateway = user_gateway
-        self._translations = translations
 
     async def __call__(self, email: str, language: str) -> UserDM:
         user = await self._user_gateway.get_by_email(email, language)

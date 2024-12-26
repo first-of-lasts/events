@@ -11,7 +11,7 @@ class User(Base):
     __tablename__ = "users"
     __table_args__ = (
         Index("idx_users_country_id", "country_id"),
-        # Index("idx_users_region_id", "region_id"),
+        Index("idx_users_region_id", "region_id"),
     )
 
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
@@ -25,7 +25,7 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
     #
     country_id: Mapped[int] = mapped_column(Integer, ForeignKey("countries.id"), nullable=True)
-    # region_id: Mapped[int] = mapped_column(Integer, ForeignKey("regions.id"), nullable=True)
+    region_id: Mapped[int] = mapped_column(Integer, ForeignKey("regions.id"), nullable=True)
     country = relationship("Country", back_populates="users")
-    # region = relationship("Region", back_populates="users")
+    region = relationship("Region", back_populates="users")
     # created_events = relationship("Event", back_populates="users")

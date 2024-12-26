@@ -12,3 +12,4 @@ class GetUser(BaseModel):
 class UpdateUser(BaseModel):
     bio: Optional[str] = Field(None, max_length=1024)
     country_id: Optional[int] = None
+    region_id: Optional[int] = None

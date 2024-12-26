@@ -38,16 +38,16 @@ class AuthProvider(Provider):
         config: Config,
         db_session: root_interface.DBSession,
         auth_gateway: auth_interface.UserSaver,
-        token_processor: auth_interface.TokenProcessor,
         email_gateway: email_interface.EmailSender,
+        token_processor: auth_interface.TokenProcessor,
         translations: dict[str, gettext.GNUTranslations],
     ) -> RegisterInteractor:
         return RegisterInteractor(
             config=config,
             db_session=db_session,
             auth_gateway=auth_gateway,
-            token_processor=token_processor,
             email_gateway=email_gateway,
+            token_processor=token_processor,
             translations=translations,
         )
 
@@ -78,15 +78,15 @@ class AuthProvider(Provider):
             self,
             config: Config,
             auth_gateway: auth_interface.UserReader,
-            token_processor: auth_interface.TokenProcessor,
             email_gateway: email_interface.EmailSender,
+            token_processor: auth_interface.TokenProcessor,
             translations: dict[str, gettext.GNUTranslations],
     ) -> PasswordResetInteractor:
         return PasswordResetInteractor(
             config=config,
             auth_gateway=auth_gateway,
-            token_processor=token_processor,
             email_gateway=email_gateway,
+            token_processor=token_processor,
             translations=translations,
         )
 

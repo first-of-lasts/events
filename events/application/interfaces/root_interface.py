@@ -14,9 +14,3 @@ class DBSession(Protocol):
     @abstractmethod
     def begin(self) -> None:
         ...
-
-    @abstractmethod
-    async def execute_query(
-            self, query: str, params: dict | None = None
-    ) -> None:
-        ...

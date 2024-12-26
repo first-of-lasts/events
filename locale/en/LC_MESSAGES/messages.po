@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-12-15 18:15+0500\n"
-"PO-Revision-Date: 2024-12-15 18:18+0500\n"
+"POT-Creation-Date: 2024-12-22 20:28+0500\n"
+"PO-Revision-Date: 2024-12-22 20:28+0500\n"
 "Last-Translator: <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
 "Language: en\n"
@@ -17,17 +17,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: C:\Users\pc\Desktop\projects\events\events_backend\events\application\interactors\auth_interactor.py:42
+#: C:\Users\pc\Desktop\projects\events\events_backend\events\application\interactors\auth_interactor.py:60
 msgid "Account verification"
 msgstr "Account verification"
 
-#: C:\Users\pc\Desktop\projects\events\events_backend\events\application\interactors\auth_interactor.py:43
+#: C:\Users\pc\Desktop\projects\events\events_backend\events\application\interactors\auth_interactor.py:61
 #, python-brace-format
-msgid "Hi {username}, visit the link: {link} to verify your account."
-msgstr "Hi {username}, visit the link: {link} to verify your account."
+msgid "Visit the link to verify your account: {link}"
+msgstr "Visit the link to verify your account: {link}"
 
+#: C:\Users\pc\Desktop\projects\events\events_backend\events\application\interactors\auth_interactor.py:135
 msgid "Password Reset"
 msgstr "Password Reset"
 
+#: C:\Users\pc\Desktop\projects\events\events_backend\events\application\interactors\auth_interactor.py:137
+#, python-brace-format
 msgid "Hi, visit the link: {reset_link} to reset your password."
 msgstr "Hi, visit the link: {reset_link} to reset your password."

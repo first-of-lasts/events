@@ -6,7 +6,7 @@ from events.main.config import Config
 
 
 class JwtTokenAuthentication:
-    def __init__(self, config):
+    def __init__(self, config: Config):
         self.jwt_token_verifier = JwtTokenVerifier(
             secret=config.app.jwt_secret,
             algorithm=config.app.jwt_secret_algorithm,
