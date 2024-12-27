@@ -16,19 +16,19 @@ class UserProvider(Provider):
     )
 
     @provide(scope=Scope.REQUEST)
-    def get_user_interactor(
+    def get_current_user_interactor(
             self,
             user_gateway: user_interface.UserReader,
-    ) -> user_interactor.GetUserInteractor:
-        return user_interactor.GetUserInteractor(
+    ) -> user_interactor.GetCurrentUserInteractor:
+        return user_interactor.GetCurrentUserInteractor(
             user_gateway=user_gateway,
         )
 
     @provide(scope=Scope.REQUEST)
-    def update_user_interactor(
+    def update_current_user_interactor(
             self,
             user_gateway: user_interface.UserUpdater
-    ) -> user_interactor.UpdateUserInteractor:
-        return user_interactor.UpdateUserInteractor(
+    ) -> user_interactor.UpdateCurrentUserInteractor:
+        return user_interactor.UpdateCurrentUserInteractor(
             user_gateway=user_gateway,
         )

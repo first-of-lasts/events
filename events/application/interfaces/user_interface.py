@@ -15,7 +15,7 @@ class UserUpdater(Protocol):
 
 class UserReader(Protocol):
     @abstractmethod
-    async def get_by_email(self, email: str, language: str) -> Optional[UserDM]:
+    async def get_by_email(self, email: str, language: str) -> UserDM:
         """
         Retrieves a user by email.
         Returns None if the user does not exist.

@@ -1,11 +1,8 @@
-import gettext
-
-from events.domain.exceptions.user import UserNotFoundError
 from events.domain.models.user import UserDM
 from events.application.interfaces import user_interface
 
 
-class GetUserInteractor:
+class GetCurrentUserInteractor:
     def __init__(
             self,
             user_gateway: user_interface.UserReader,
@@ -13,11 +10,10 @@ class GetUserInteractor:
         self._user_gateway = user_gateway
 
     async def __call__(self, email: str, language: str) -> UserDM:
-        user = await self._user_gateway.get_by_email(email, language)
-        return user
+        return await self._user_gateway.get_by_email(email, language)
 
 
-class UpdateUserInteractor:
+class UpdateCurrentUserInteractor:
     def __init__(
             self,
             user_gateway: user_interface.UserUpdater,

@@ -23,9 +23,10 @@ class User(Base):
     is_admin: Mapped[bool]  = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
-    #
+    # Foreign Keys
     country_id: Mapped[int] = mapped_column(Integer, ForeignKey("countries.id"), nullable=True)
     region_id: Mapped[int] = mapped_column(Integer, ForeignKey("regions.id"), nullable=True)
+    # Relationships
     country = relationship("Country", back_populates="users")
     region = relationship("Region", back_populates="users")
-    # created_events = relationship("Event", back_populates="users")
+    events = relationship("Event", back_populates="creator")
