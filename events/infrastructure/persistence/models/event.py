@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from sqlalchemy import String, ForeignKey, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -10,7 +9,7 @@ class Event(Base):
     __tablename__ = "events"
 
     title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    description: Mapped[str] = mapped_column(String(2048), nullable=True)
+    description: Mapped[str] = mapped_column(String(2048))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
     # Foreign Keys

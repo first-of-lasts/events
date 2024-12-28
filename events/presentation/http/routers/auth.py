@@ -1,9 +1,9 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, Depends
 from dishka.integrations.base import FromDishka
 from dishka.integrations.fastapi import inject
 
+from events.application.dto.auth import NewUserDTO
 from events.application.interactors import auth_interactor
-from events.application.dto import auth_dto
 from events.presentation.http.dependencies.language import get_valid_language
 from events.presentation.http.schemas import auth as schemas
 
@@ -18,12 +18,12 @@ async def register(
         interactor: FromDishka[auth_interactor.RegisterInteractor],
         language: str = Depends(get_valid_language),
 ):
-    dto = auth_dto.NewUserDTO(
+    dto = NewUserDTO(
         email=str(data.email),
         username=data.username,
         password=data.password,
     )
-    await interactor(dto=dto, language=language)
+    await interactor(user_dto=dto, language=language)
     return {"message": "User created successfully"}
 
 
@@ -43,11 +43,7 @@ async def login(
         data: schemas.Login,
         interactor: FromDishka[auth_interactor.LoginInteractor],
 ):
-    dto = auth_dto.LoginUserDTO(
-        email=str(data.email),
-        password=data.password
-    )
-    tokens = await interactor(dto)
+    tokens = await interactor(email=str(data.email), password=data.password)
     return tokens
 
 

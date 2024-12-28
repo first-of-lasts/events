@@ -1,6 +1,4 @@
-from typing import List, Optional
-
-from sqlalchemy import String, Integer, ForeignKey, UniqueConstraint
+from sqlalchemy import String, Integer, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from events.infrastructure.persistence.manager import Base
@@ -17,6 +15,7 @@ class Region(Base):
     # Relationships
     country = relationship(argument="Country", back_populates="regions")
     users = relationship(argument="User", back_populates="region")
+    events = relationship(argument="Event", back_populates="region")
 
     def get_name(self, language: str) -> str:
         return getattr(self, f"name_{language}", "")

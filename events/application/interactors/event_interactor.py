@@ -1,4 +1,5 @@
 from events.application.interfaces import event_interface
+from events.application.dto.event import NewEventDTO
 
 
 class CreateEventInteractor:
@@ -8,5 +9,8 @@ class CreateEventInteractor:
     ) -> None:
         self._event_gateway = event_gateway
 
-    async def __call__(self, email: str) -> None:
+    async def __call__(self, event_dto: NewEventDTO, email: str) -> None:
+        print("EVENT DTO", event_dto)
+
+        # TODO get user from email
         return await self._event_gateway.save()

@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from typing import Optional
-from pydantic import BaseModel, Field
 
 
-class CreateEvent(BaseModel):
+@dataclass(slots=True)
+class NewEventDTO:
     title: str
-    description: str = Field(max_length=2048)
+    description: str
     country_id: Optional[int] = None
     region_id: Optional[int] = None
