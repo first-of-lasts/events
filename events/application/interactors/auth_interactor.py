@@ -3,10 +3,10 @@ import gettext
 from events.domain.models.user import UserDM
 from events.domain.exceptions.user import UserCannotBeCreatedError
 from events.domain.exceptions.access import AuthenticationError
-from events.application.interfaces import email_interface
+from events.application.interfaces import email_interface, user_interface
 from events.application.interfaces import root_interface
 from events.application.interfaces import auth_interface
-from events.application.dto.auth import NewUserDTO
+from events.application.dto import auth as auth_dto
 from events.application.utils.security import verify_password, hash_password
 from events.infrastructure.auth.token import TokenType
 from events.main.config import Config
@@ -17,7 +17,7 @@ class RegisterInteractor:
             self,
             config: Config,
             db_session: root_interface.DBSession,
-            auth_gateway: auth_interface.UserSaver,
+            auth_gateway: auth_interface.UserCreator,
             email_gateway: email_interface.EmailSender,
             token_processor: auth_interface.TokenProcessor,
             translations: dict[str, gettext.GNUTranslations],
@@ -29,29 +29,29 @@ class RegisterInteractor:
         self._token_processor = token_processor
         self._translations = translations
 
-    async def __call__(self, user_dto: NewUserDTO, language: str) -> None:
+    async def __call__(self, dto: auth_dto.NewUserDTO, language: str) -> None:
         async with self._db_session.begin():
-            await self._auth_gateway.delete_inactive_by_email(user_dto.email)
-            email_conflicts = await self._auth_gateway.exists_by_email(user_dto.email)
+            await self._auth_gateway.delete_inactive_by_email(str(dto.email))
+            email_conflicts = await self._auth_gateway.exists_by_email(str(dto.email))
             if email_conflicts:
                 raise UserCannotBeCreatedError("Email already exists")
-            username_conflicts = await self._auth_gateway.exists_by_username(user_dto.username)
+            username_conflicts = await self._auth_gateway.exists_by_username(dto.username)
             if username_conflicts:
                 raise UserCannotBeCreatedError("Username already exists")
 
             user = UserDM(
-                email=user_dto.email,
-                username=user_dto.username,
-                password=hash_password(user_dto.password),
+                email=str(dto.email),
+                username=dto.username,
+                password=hash_password(dto.password),
             )
-            await self._auth_gateway.save(user)
-        await self._send_verification_email(email=user_dto.email, language=language)
+            await self._auth_gateway.create_user(user)
+        await self._send_verification_email(email=str(dto.email), language=language)
 
     async def _send_verification_email(self, email: str, language: str) -> None:
         _ = self._translations[language].gettext
         #
         token = self._token_processor.create_access_token(email)
-        verification_link = f"{self._config.app.base_url}/verify-email?token={token}"
+        verification_link = f"{self._config.app.base_url}/api/v1/auth/verify?token={token}"
         subject = _("Account verification")
         body = _("Visit the link to verify your account: {link}").format(link=verification_link)
         await self._email_gateway.send_email(
@@ -78,14 +78,14 @@ class VerifyInteractor:
 class LoginInteractor:
     def __init__(
             self,
-            auth_gateway: auth_interface.UserReader,
+            user_gateway: user_interface.UserReader,
             token_processor: auth_interface.TokenProcessor,
     ) -> None:
-        self._auth_gateway = auth_gateway
+        self._user_gateway = user_gateway
         self._token_processor = token_processor
 
     async def __call__(self, email: str, password: str) -> dict:
-        user = await self._auth_gateway.get_by_email(email)
+        user = await self._user_gateway.get_by_email(email)
         if user and user.is_verified and user.is_active:
             if not verify_password(password, user.password):
                 raise AuthenticationError("Invalid credentials")
@@ -105,19 +105,19 @@ class PasswordResetInteractor:
     def __init__(
             self,
             config: Config,
-            auth_gateway: auth_interface.UserReader,
+            user_gateway: user_interface.UserReader,
             email_gateway: email_interface.EmailSender,
             token_processor: auth_interface.TokenProcessor,
             translations: dict[str, gettext.GNUTranslations],
     ) -> None:
         self._config = config
-        self._auth_gateway = auth_gateway
+        self._user_gateway = user_gateway
         self._email_gateway = email_gateway
         self._token_processor = token_processor
         self._translations = translations
 
     async def __call__(self, email: str, language: str) -> None:
-        user = await self._auth_gateway.get_by_email(email)
+        user = await self._user_gateway.get_by_email(email)
         if user:
             await self._send_reset_email(email=email, language=language)
 
@@ -125,7 +125,7 @@ class PasswordResetInteractor:
         _ = self._translations[language].gettext
         #
         token = self._token_processor.create_password_reset_token(email)
-        reset_link = f"{self._config.app.base_url}/reset-password?token={token}"
+        reset_link = f"{self._config.app.base_url}/api/v1/auth/reset-password?token={token}"
         subject = _("Password Reset")
         body = _(
             "Hi, visit the link: {reset_link} to reset your password."

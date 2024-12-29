@@ -1,9 +1,9 @@
-from dataclasses import dataclass
 from typing import Optional
 
+from pydantic import BaseModel
 
-@dataclass(slots=True)
-class NewEventDTO:
+
+class NewEventDTO(BaseModel):
     title: str
     description: str
     country_id: Optional[int] = None

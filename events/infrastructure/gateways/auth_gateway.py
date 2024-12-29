@@ -1,18 +1,16 @@
 from typing import Optional
-
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from events.domain.models.user import UserDM
 from events.application.interfaces import auth_interface
 from events.infrastructure.persistence.models.user import User
 from events.infrastructure.auth.token import JwtTokenProcessor, TokenType
-from events.domain.models.user import UserDM
 
 
 class AuthGateway(
-    auth_interface.UserSaver,
+    auth_interface.UserCreator,
     auth_interface.UserUpdater,
-    auth_interface.UserReader,
     auth_interface.TokenProcessor,
 ):
     def __init__(self, session: AsyncSession, token_processor: JwtTokenProcessor):
@@ -37,7 +35,7 @@ class AuthGateway(
         result = await self._session.execute(stmt)
         return result.scalars().one_or_none() is not None
 
-    async def save(self, user: UserDM):
+    async def create_user(self, user: UserDM):
         new_user = User(
             email=user.email,
             username=user.username,
@@ -53,22 +51,6 @@ class AuthGateway(
         )
         await self._session.execute(stmt)
         await self._session.commit()
-
-    async def get_by_email(self, email: str) -> Optional[UserDM]:
-        result = await self._session.execute(
-            select(User)
-            .where(User.email == email, User.is_verified == True, User.is_active == True)
-        )
-        user = result.scalars().one_or_none()
-        if user:
-            return UserDM(
-                id=user.id,
-                username=user.username,
-                email=user.email,
-                password=user.password,
-                is_verified=user.is_verified,
-                is_active=user.is_active,
-            )
 
     def create_access_token(self, user_email: str) -> str:
         return self._token_processor.create_access_token(user_email)

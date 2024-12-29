@@ -2,7 +2,7 @@ import gettext
 from datetime import timedelta
 from dishka import Provider, Scope, provide, AnyOf
 
-from events.application.interfaces import root_interface
+from events.application.interfaces import root_interface, user_interface
 from events.application.interfaces import auth_interface
 from events.application.interfaces import email_interface
 from events.application.interactors import auth_interactor
@@ -16,7 +16,7 @@ class AuthProvider(Provider):
         source=AuthGateway,
         scope=Scope.REQUEST,
         provides=AnyOf[
-            auth_interface.UserSaver, auth_interface.UserUpdater, auth_interface.UserReader, auth_interface.TokenProcessor
+            auth_interface.UserCreator, auth_interface.UserUpdater, auth_interface.TokenProcessor
         ]
     )
 
@@ -34,7 +34,7 @@ class AuthProvider(Provider):
         self,
         config: Config,
         db_session: root_interface.DBSession,
-        auth_gateway: auth_interface.UserSaver,
+        auth_gateway: auth_interface.UserCreator,
         email_gateway: email_interface.EmailSender,
         token_processor: auth_interface.TokenProcessor,
         translations: dict[str, gettext.GNUTranslations],
@@ -62,11 +62,11 @@ class AuthProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def login_interactor(
             self,
-            auth_gateway: auth_interface.UserReader,
+            user_gateway: user_interface.UserReader,
             token_processor: auth_interface.TokenProcessor,
     ) -> auth_interactor.LoginInteractor:
         return auth_interactor.LoginInteractor(
-            auth_gateway=auth_gateway,
+            user_gateway=user_gateway,
             token_processor=token_processor,
         )
 
@@ -74,14 +74,14 @@ class AuthProvider(Provider):
     def password_reset_interactor(
             self,
             config: Config,
-            auth_gateway: auth_interface.UserReader,
+            user_gateway: user_interface.UserReader,
             email_gateway: email_interface.EmailSender,
             token_processor: auth_interface.TokenProcessor,
             translations: dict[str, gettext.GNUTranslations],
     ) -> auth_interactor.PasswordResetInteractor:
         return auth_interactor.PasswordResetInteractor(
             config=config,
-            auth_gateway=auth_gateway,
+            user_gateway=user_gateway,
             email_gateway=email_gateway,
             token_processor=token_processor,
             translations=translations,

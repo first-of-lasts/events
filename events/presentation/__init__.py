@@ -9,10 +9,10 @@ from events.presentation.http.exceptions import app_exception_handler
 
 
 def include_routers(app: FastAPI) -> None:
-    app.include_router(auth_router, prefix="/auth", tags=["auth", ])
-    app.include_router(user_router, prefix="/user", tags=["user", ])
-    app.include_router(location_router, prefix="/location", tags=["location", ])
-    app.include_router(event_router, prefix="/event", tags=["event", ])
+    app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth", ])
+    app.include_router(user_router, prefix="/api/v1/user", tags=["user", ])
+    app.include_router(location_router, prefix="/api/v1/location", tags=["location", ])
+    app.include_router(event_router, prefix="/api/v1/event", tags=["event", ])
 
 
 def include_exception_handlers(app: FastAPI) -> None:

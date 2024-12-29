@@ -10,7 +10,7 @@ class GetCurrentUserInteractor:
         self._user_gateway = user_gateway
 
     async def __call__(self, email: str, language: str) -> UserDM:
-        return await self._user_gateway.get_by_email(email, language)
+        return await self._user_gateway.get_by_email_with_details(email, language)
 
 
 class UpdateCurrentUserInteractor:

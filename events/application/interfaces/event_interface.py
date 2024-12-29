@@ -4,7 +4,7 @@ from typing import Protocol
 from events.domain.models.event import EventDM
 
 
-class EventSaver(Protocol):
+class EventCreator(Protocol):
     @abstractmethod
-    async def save(self, event: EventDM) -> None:
-        pass
+    async def create_event(self, event: EventDM) -> None:
+        ...

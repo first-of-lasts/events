@@ -19,7 +19,23 @@ class UserGateway(
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_by_email(self, email: str, language: str) -> UserDM:
+    async def get_by_email(self, email: str) -> UserDM:
+        result = await self._session.execute(
+            select(User)
+            .where(User.email == email, User.is_verified == True, User.is_active == True)
+        )
+        user = result.scalars().one_or_none()
+        if user:
+            return UserDM(
+                id=user.id,
+                username=user.username,
+                email=user.email,
+                password=user.password,
+                is_verified=user.is_verified,
+                is_active=user.is_active,
+            )
+
+    async def get_by_email_with_details(self, email: str, language: str) -> UserDM:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_active == True)

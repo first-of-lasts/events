@@ -8,12 +8,12 @@ from events.infrastructure.persistence.models import Event
 
 
 class EventGateway(
-    event_interface.EventSaver
+    event_interface.EventCreator
 ):
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def save(self, event: EventDM) -> None:
+    async def create_event(self, event: EventDM) -> None:
         new_event = Event(
             title=event.title,
             description=event.description,
