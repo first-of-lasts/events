@@ -6,7 +6,7 @@ from events.infrastructure.gateways.event_gateway import EventGateway
 
 
 class EventProvider(Provider):
-    location_gateway = provide(
+    event_gateway = provide(
         source=EventGateway,
         scope=Scope.REQUEST,
         provides=AnyOf[

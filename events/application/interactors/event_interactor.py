@@ -14,8 +14,11 @@ class CreateEventInteractor:
 
     async def __call__(self, dto: event_dto.NewEventDTO, email: str) -> None:
         user = await self._user_gateway.get_by_email(email)
-        # TODO
         new_event = EventDM(
-
+            user_id=user.id,
+            title=dto.title,
+            description=dto.description,
+            country_id=dto.country_id,
+            region_id=dto.region_id,
         )
         await self._event_gateway.create_event(new_event)

@@ -20,3 +20,5 @@ async def create_event(
 ):
     await interactor(dto=data, email=user_email)
     return {"message": "Event created successfully"}
+
+

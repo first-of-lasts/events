@@ -10,5 +10,8 @@ class EventDM:
     title: str
     description: str
     id: Optional[int] = None
+    user_id: Optional[int] = None
+    country_id: Optional[int] = None
+    region_id: Optional[int] = None
     country: Optional[CountryDM] = None
     region: Optional[RegionDM] = None

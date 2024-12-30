@@ -15,14 +15,11 @@ class EventGateway(
 
     async def create_event(self, event: EventDM) -> None:
         new_event = Event(
+            user_id=event.user_id,
             title=event.title,
             description=event.description,
-            country_id=event.country
+            country_id=event.country_id,
+            region_id=event.region_id,
         )
         self._session.add(new_event)
-        # new_user = User(
-        #     email=user.email,
-        #     username=user.username,
-        #     password=user.password,
-        # )
-        # self._session.add(new_user)
+        await self._session.commit()
