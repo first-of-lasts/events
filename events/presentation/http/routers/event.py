@@ -11,6 +11,9 @@ from events.presentation.http.schemas import event as schemas
 event_router = APIRouter()
 
 
+# TODO update event, my events, event list based on filtration
+
+
 @event_router.post("/",)
 @inject
 async def create_event(
@@ -22,3 +25,17 @@ async def create_event(
     return {"message": "Event created successfully"}
 
 
+@event_router.patch("<int:pk>/")
+@inject
+async def update_event(
+
+):
+    pass
+
+
+@event_router.delete("")
+@inject
+async def delete_event(
+
+):
+    pass
