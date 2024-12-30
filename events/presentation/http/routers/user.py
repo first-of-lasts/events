@@ -4,6 +4,7 @@ from dishka import FromDishka
 from dishka.integrations.fastapi import inject
 
 from events.application.interactors import user_interactor
+from events.application.dto import user as user_dto
 from events.presentation.http.dependencies.authentication import get_user_email
 from events.presentation.http.dependencies.language import get_valid_language
 from events.presentation.http.schemas import user as schemas
@@ -33,9 +34,9 @@ async def get_current_user(
 @user_router.patch("/me")
 @inject
 async def update_current_user(
-        updates: schemas.UpdateUser,
+        data: user_dto.UpdateUserDTO,
         interactor: FromDishka[user_interactor.UpdateCurrentUserInteractor],
         user_email: str = Depends(get_user_email),
 ):
-    await interactor(user_email, dict(updates))
+    await interactor(dto=data, email=user_email)
     return {"message": "User updated successfully"}

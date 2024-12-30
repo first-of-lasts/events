@@ -32,9 +32,11 @@ class RegisterInteractor:
     async def __call__(self, dto: auth_dto.NewUserDTO, language: str) -> None:
         async with self._db_session.begin():
             await self._auth_gateway.delete_inactive_by_email(str(dto.email))
+
             email_conflicts = await self._auth_gateway.exists_by_email(str(dto.email))
             if email_conflicts:
                 raise UserCannotBeCreatedError("Email already exists")
+
             username_conflicts = await self._auth_gateway.exists_by_username(dto.username)
             if username_conflicts:
                 raise UserCannotBeCreatedError("Username already exists")
@@ -62,7 +64,7 @@ class RegisterInteractor:
 class VerifyInteractor:
     def __init__(
             self,
-            auth_gateway: auth_interface.UserUpdater,
+            auth_gateway: auth_interface.UserPrimaryDataUpdater,
             token_processor: auth_interface.TokenProcessor,
     ) -> None:
         self._auth_gateway = auth_gateway
@@ -72,7 +74,7 @@ class VerifyInteractor:
         email = self._token_processor.verify_token(
             token, token_type=TokenType.ACCESS
         )
-        await self._auth_gateway.update(email, {"is_verified": True})
+        await self._auth_gateway.verify_user(email)
 
 
 class LoginInteractor:
@@ -138,18 +140,18 @@ class PasswordResetInteractor:
 class PasswordResetConfirmInteractor:
     def __init__(
             self,
-            auth_gateway: auth_interface.UserUpdater,
+            auth_gateway: auth_interface.UserPrimaryDataUpdater,
             token_processor: auth_interface.TokenProcessor,
     ) -> None:
         self._auth_gateway = auth_gateway
         self._token_processor = token_processor
 
-    async def __call__(self, token: str, password: str) -> None:
+    async def __call__(self, token: str, new_password: str) -> None:
         email = self._token_processor.verify_token(
             token, token_type=TokenType.PASSWORD_RESET
         )
-        hashed_password = hash_password(password)
-        await self._auth_gateway.update(email, {"password": hashed_password})
+        new_password = hash_password(new_password)
+        await self._auth_gateway.change_user_password(email, new_password)
 
 
 class CreateTokenPairInteractor:

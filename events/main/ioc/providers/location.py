@@ -31,3 +31,6 @@ class LocationProvider(Provider):
         return location_interactor.GetRegionsInteractor(
             location_gateway=location_gateway
         )
+    # check country with region.country
+    # get_country_owner
+    # get_region_owner

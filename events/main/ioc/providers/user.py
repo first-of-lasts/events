@@ -2,7 +2,7 @@ from dishka import Provider, provide, Scope, AnyOf
 
 from events.application.interactors import user_interactor
 from events.infrastructure.gateways.user_gateway import UserGateway
-from events.application.interfaces import user_interface
+from events.application.interfaces import user_interface, location_interface
 
 
 
@@ -27,8 +27,10 @@ class UserProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def update_current_user_interactor(
             self,
-            user_gateway: user_interface.UserUpdater
+            user_gateway: user_interface.UserUpdater,
+            location_gateway: location_interface.CountryReader and location_interface.RegionReader,
     ) -> user_interactor.UpdateCurrentUserInteractor:
         return user_interactor.UpdateCurrentUserInteractor(
             user_gateway=user_gateway,
+            location_gateway=location_gateway,
         )

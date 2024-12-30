@@ -16,7 +16,7 @@ class AuthProvider(Provider):
         source=AuthGateway,
         scope=Scope.REQUEST,
         provides=AnyOf[
-            auth_interface.UserCreator, auth_interface.UserUpdater, auth_interface.TokenProcessor
+            auth_interface.UserCreator, auth_interface.UserPrimaryDataUpdater, auth_interface.TokenProcessor
         ]
     )
 
@@ -51,7 +51,7 @@ class AuthProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def verify_interactor(
             self,
-            auth_gateway: auth_interface.UserUpdater,
+            auth_gateway: auth_interface.UserPrimaryDataUpdater,
             token_processor: auth_interface.TokenProcessor,
     ) -> auth_interactor.VerifyInteractor:
         return auth_interactor.VerifyInteractor(
@@ -90,7 +90,7 @@ class AuthProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def password_reset_confirm_interactor(
             self,
-            auth_gateway: auth_interface.UserUpdater,
+            auth_gateway: auth_interface.UserPrimaryDataUpdater,
             token_processor: auth_interface.TokenProcessor,
     ) -> auth_interactor.PasswordResetConfirmInteractor:
         return auth_interactor.PasswordResetConfirmInteractor(

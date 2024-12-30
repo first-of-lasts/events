@@ -19,13 +19,17 @@ class UserCreator(Protocol):
         ...
 
     @abstractmethod
-    async def create_user(self, user: UserDM):
+    async def create_user(self, user: UserDM) -> None:
         ...
 
 
-class UserUpdater(Protocol):
+class UserPrimaryDataUpdater(Protocol):
     @abstractmethod
-    async def update(self, email: str, update_data: dict) -> None:
+    async def verify_user(self, email: str) -> None:
+        ...
+
+    @abstractmethod
+    async def change_user_password(self, email: str, new_password: str) -> None:
         ...
 
 

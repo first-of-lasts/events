@@ -1,15 +1,15 @@
-from sqlalchemy import select
+from dataclasses import asdict
+from typing import Optional
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from events.application.interfaces import user_interface
 from events.domain.models.region import RegionDM
 from events.domain.models.country import CountryDM
 from events.domain.models.user import UserDM
 from events.domain.exceptions.user import UserNotFoundError
-from events.domain.exceptions.region import InvalidRegionError
-from events.application.interfaces import user_interface
 from events.infrastructure.persistence.models.user import User
-from events.infrastructure.persistence.models import Region
 
 
 class UserGateway(
@@ -19,10 +19,11 @@ class UserGateway(
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_by_email(self, email: str) -> UserDM:
+    async def get_by_email(self, email: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_active == True)
+            .limit(1)
         )
         user = result.scalars().one_or_none()
         if user:
@@ -35,11 +36,12 @@ class UserGateway(
                 is_active=user.is_active,
             )
 
-    async def get_by_email_with_details(self, email: str, language: str) -> UserDM:
+    async def get_by_email_with_details(self, email: str, language: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_active == True)
             .options(selectinload(User.country), selectinload(User.region))
+            .limit(1)
         )
         user = result.scalars().one_or_none()
         if user:
@@ -64,30 +66,12 @@ class UserGateway(
                 country=country_dm,
                 region=region_dm,
             )
-        else:
-            raise UserNotFoundError("User not found")
 
     async def update(self, email: str, update_data: dict) -> None:
-        result = await self._session.execute(
-            select(User).where(User.email == email)
+        stmt = (
+            update(User)
+            .where(User.email == email)
+            .values(**update_data)
         )
-        user = result.scalars().one_or_none()
-        if not user:
-            raise UserNotFoundError("User not found")
-        #
-        new_country_id = update_data.get("country_id", user.country_id)
-        new_region_id = update_data.get("region_id", user.region_id)
-        if new_region_id:
-            if not new_country_id:
-                raise InvalidRegionError("Invalid region")
-            region_result = await self._session.execute(
-                select(Region).where(Region.id == new_region_id)
-            )
-            region = region_result.scalars().one_or_none()
-            if (not region) or (region.country_id != new_country_id):
-                raise InvalidRegionError("Invalid region")
-        #
-        for key, value in update_data.items():
-            if value is not None:
-                setattr(user, key, value)
+        await self._session.execute(stmt)
         await self._session.commit()

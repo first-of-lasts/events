@@ -21,9 +21,3 @@ class RetrieveUser(BaseModel):
     bio: Optional[str]
     country: Optional[Country]
     region: Optional[Region]
-
-
-class UpdateUser(BaseModel):
-    bio: Optional[str] = Field(None, max_length=1024)
-    country_id: Optional[int] = None
-    region_id: Optional[int] = None

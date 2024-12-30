@@ -8,8 +8,8 @@ from events.infrastructure.persistence.manager import Base
 class Event(Base):
     __tablename__ = "events"
 
-    title: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    description: Mapped[str] = mapped_column(String(2048))
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str] = mapped_column(String(2048), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
     # Foreign Keys

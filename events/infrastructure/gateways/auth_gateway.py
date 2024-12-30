@@ -10,7 +10,7 @@ from events.infrastructure.auth.token import JwtTokenProcessor, TokenType
 
 class AuthGateway(
     auth_interface.UserCreator,
-    auth_interface.UserUpdater,
+    auth_interface.UserPrimaryDataUpdater,
     auth_interface.TokenProcessor,
 ):
     def __init__(self, session: AsyncSession, token_processor: JwtTokenProcessor):
@@ -35,7 +35,7 @@ class AuthGateway(
         result = await self._session.execute(stmt)
         return result.scalars().one_or_none() is not None
 
-    async def create_user(self, user: UserDM):
+    async def create_user(self, user: UserDM) -> None:
         new_user = User(
             email=user.email,
             username=user.username,
@@ -43,11 +43,20 @@ class AuthGateway(
         )
         self._session.add(new_user)
 
-    async def update(self, email: str, update_data: dict) -> None:
+    async def verify_user(self, email: str) -> None:
         stmt = (
             update(User)
             .where(User.email == email)
-            .values(**update_data)
+            .values(is_verified=True)
+        )
+        await self._session.execute(stmt)
+        await self._session.commit()
+
+    async def change_user_password(self, email: str, new_password: str) -> None:
+        stmt = (
+            update(User)
+            .where(User.email == email)
+            .values(password=new_password)
         )
         await self._session.execute(stmt)
         await self._session.commit()

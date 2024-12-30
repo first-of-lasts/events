@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends
 from dishka.integrations.base import FromDishka
 from dishka.integrations.fastapi import inject
 
-from events.application.dto import auth as auth_dto
 from events.application.interactors import auth_interactor
+from events.application.dto import auth as auth_dto
 from events.presentation.http.dependencies.language import get_valid_language
 from events.presentation.http.schemas import auth as schemas
 
@@ -18,7 +18,7 @@ async def register(
         interactor: FromDishka[auth_interactor.RegisterInteractor],
         language: str = Depends(get_valid_language),
 ):
-    await interactor(user_dto=data, language=language)
+    await interactor(dto=data, language=language)
     return {"message": "User created successfully"}
 
 

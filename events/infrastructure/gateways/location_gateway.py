@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,6 +17,14 @@ class LocationGateway(
     def __init__(self, session: AsyncSession):
         self._session = session
 
+    async def exists_country_by_id(self, country_id: int) -> bool:
+        result =  await self._session.execute(
+            select(Country)
+            .where(Country.id == country_id)
+            .limit(1)
+        )
+        return result.scalars().one_or_none() is not None
+
     async def get_country_list(self, language: str) -> List[CountryDM]:
         result = await self._session.execute(select(Country))
         countries = result.scalars().all()
@@ -30,6 +38,19 @@ class LocationGateway(
                 )
             )
         return country_list
+
+    async def get_region(self, region_id: int) -> Optional[RegionDM]:
+        result = await self._session.execute(
+            select(Region)
+            .where(Region.id == region_id)
+            .limit(1)
+        )
+        region = result.scalars().one_or_none()
+        if region:
+            return RegionDM(
+                id=region.id,
+                country_id=region.country_id,
+            )
 
     async def get_region_list(self, country_id: int, language: str) -> List[RegionDM]:
         country_exists = await self._session.execute(
