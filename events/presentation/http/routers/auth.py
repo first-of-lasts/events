@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends
 from dishka.integrations.base import FromDishka
 from dishka.integrations.fastapi import inject
 
+from events.domain.schemas import auth as schemas
 from events.application.interactors import auth_interactor
 from events.application.dto import auth as auth_dto
 from events.presentation.http.dependencies.language import get_valid_language
-from events.presentation.http.schemas import auth as schemas
 
 
 auth_router = APIRouter()

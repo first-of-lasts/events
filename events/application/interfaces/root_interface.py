@@ -12,5 +12,5 @@ class DBSession(Protocol):
         ...
 
     @abstractmethod
-    def begin(self) -> None:
+    async def begin(self) -> None:
         ...

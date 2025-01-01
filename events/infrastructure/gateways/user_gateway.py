@@ -1,14 +1,13 @@
-from dataclasses import asdict
 from typing import Optional
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from events.application.interfaces import user_interface
 from events.domain.models.region import RegionDM
 from events.domain.models.country import CountryDM
 from events.domain.models.user import UserDM
-from events.domain.exceptions.user import UserNotFoundError
+from events.domain.schemas.user import CurrentUser
+from events.application.interfaces import user_interface
 from events.infrastructure.persistence.models.user import User
 
 
@@ -31,12 +30,26 @@ class UserGateway(
                 id=user.id,
                 username=user.username,
                 email=user.email,
+            )
+
+    async def get_by_email_for_login(self, email: str) -> Optional[UserDM]:
+        result = await self._session.execute(
+            select(User)
+            .where(User.email == email, User.is_verified == True, User.is_active == True)
+            .limit(1)
+        )
+        user = result.scalars().one_or_none()
+        if user:
+            return UserDM(
+                id=user.id,
+                username=user.username,
+                email=user.email,
                 password=user.password,
                 is_verified=user.is_verified,
                 is_active=user.is_active,
             )
 
-    async def get_by_email_with_details(self, email: str, language: str) -> Optional[UserDM]:
+    async def get_current_user(self, email: str, language: str) -> Optional[CurrentUser]:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_active == True)
@@ -58,7 +71,7 @@ class UserGateway(
                     id=user.region.id,
                     name=user.region.get_name(language),
                 )
-            return UserDM(
+            return CurrentUser(
                 id=user.id,
                 username=user.username,
                 email=user.email,
@@ -67,11 +80,10 @@ class UserGateway(
                 region=region_dm,
             )
 
-    async def update(self, email: str, update_data: dict) -> None:
-        stmt = (
+    async def update_user(self, email: str, update_data: dict) -> None:
+        await self._session.execute(
             update(User)
             .where(User.email == email)
             .values(**update_data)
         )
-        await self._session.execute(stmt)
         await self._session.commit()

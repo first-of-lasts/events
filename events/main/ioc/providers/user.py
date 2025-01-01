@@ -1,8 +1,9 @@
 from dishka import Provider, provide, Scope, AnyOf
 
+from events.application.services.location_validator import LocationValidator
 from events.application.interactors import user_interactor
 from events.infrastructure.gateways.user_gateway import UserGateway
-from events.application.interfaces import user_interface, location_interface
+from events.application.interfaces import user_interface
 
 
 
@@ -11,7 +12,8 @@ class UserProvider(Provider):
         source=UserGateway,
         scope=Scope.REQUEST,
         provides=AnyOf[
-            user_interface.UserReader, user_interface.UserUpdater,
+            user_interface.UserReader,
+            user_interface.UserUpdater,
         ]
     )
 
@@ -28,9 +30,9 @@ class UserProvider(Provider):
     def update_current_user_interactor(
             self,
             user_gateway: user_interface.UserUpdater,
-            location_gateway: location_interface.CountryReader and location_interface.RegionReader,
+            location_validator: LocationValidator,
     ) -> user_interactor.UpdateCurrentUserInteractor:
         return user_interactor.UpdateCurrentUserInteractor(
             user_gateway=user_gateway,
-            location_gateway=location_gateway,
+            location_validator=location_validator,
         )

@@ -16,7 +16,9 @@ class AuthProvider(Provider):
         source=AuthGateway,
         scope=Scope.REQUEST,
         provides=AnyOf[
-            auth_interface.UserCreator, auth_interface.UserPrimaryDataUpdater, auth_interface.TokenProcessor
+            auth_interface.UserCreator,
+            auth_interface.UserPrimaryDataUpdater,
+            auth_interface.TokenProcessor,
         ]
     )
 

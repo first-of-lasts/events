@@ -14,7 +14,5 @@ class UserDM:
     bio: Optional[str] = None
     is_verified: Optional[bool] = None
     is_active: Optional[bool] = None
-    country_id: Optional[int] = None
-    region_id: Optional[int] = None
     country: Optional[CountryDM] = None
     region: Optional[RegionDM] = None

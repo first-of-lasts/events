@@ -87,7 +87,7 @@ class LoginInteractor:
         self._token_processor = token_processor
 
     async def __call__(self, email: str, password: str) -> dict:
-        user = await self._user_gateway.get_by_email(email)
+        user = await self._user_gateway.get_by_email_for_login(email)
         if user and user.is_verified and user.is_active:
             if not verify_password(password, user.password):
                 raise AuthenticationError("Invalid credentials")

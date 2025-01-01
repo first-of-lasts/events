@@ -1,8 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol, List, Optional
 
-from events.domain.models.country import CountryDM
-from events.domain.models.region import RegionDM
+from events.domain.schemas.location import CountryList, RegionList
 
 
 class CountryReader(Protocol):
@@ -11,15 +10,19 @@ class CountryReader(Protocol):
         ...
 
     @abstractmethod
-    async def get_country_list(self, language: str) -> List[CountryDM]:
+    async def get_countries_list(self, language: str) -> List[CountryList]:
         ...
 
 
 class RegionReader(Protocol):
     @abstractmethod
-    async def get_region(self, region_id: int) -> Optional[RegionDM]:
+    async def get_region_country_id(self, region_id: int) -> Optional[int]:
         ...
 
     @abstractmethod
-    async def get_region_list(self, country_id: int, language: str) -> List[RegionDM]:
+    async def get_regions_list(self, country_id: int, language: str) -> List[RegionList]:
         ...
+
+
+class LocationGatewayInterface(CountryReader, RegionReader, Protocol):
+    pass

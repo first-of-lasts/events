@@ -18,21 +18,30 @@ class AuthGateway(
         self._token_processor = token_processor
 
     async def delete_inactive_by_email(self, email: str) -> None:
-        stmt = select(User).where(User.email == email).with_for_update()
-        result = await self._session.execute(stmt)
+        result = await self._session.execute(
+            select(User)
+            .where(User.email == email)
+            .with_for_update()
+        )
         user = result.scalars().one_or_none()
         if user and not user.is_verified:
             await self._session.delete(user)
             await self._session.flush()
 
     async def exists_by_email(self, email: str) -> bool:
-        stmt = select(User).where(User.email == email).limit(1)
-        result = await self._session.execute(stmt)
+        result = await self._session.execute(
+            select(User)
+            .where(User.email == email)
+            .limit(1)
+        )
         return result.scalars().one_or_none() is not None
 
     async def exists_by_username(self, username: str) -> bool:
-        stmt = select(User).where(User.username == username).limit(1)
-        result = await self._session.execute(stmt)
+        result = await self._session.execute(
+            select(User)
+            .where(User.username == username)
+            .limit(1)
+        )
         return result.scalars().one_or_none() is not None
 
     async def create_user(self, user: UserDM) -> None:
@@ -44,21 +53,19 @@ class AuthGateway(
         self._session.add(new_user)
 
     async def verify_user(self, email: str) -> None:
-        stmt = (
+        await self._session.execute(
             update(User)
             .where(User.email == email)
             .values(is_verified=True)
         )
-        await self._session.execute(stmt)
         await self._session.commit()
 
     async def change_user_password(self, email: str, new_password: str) -> None:
-        stmt = (
+        await self._session.execute(
             update(User)
             .where(User.email == email)
             .values(password=new_password)
         )
-        await self._session.execute(stmt)
         await self._session.commit()
 
     def create_access_token(self, user_email: str) -> str:
