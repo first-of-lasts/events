@@ -1,10 +1,13 @@
 from typing import List
-from sqlalchemy import select, update, desc, asc
+from sqlalchemy import select, update, desc, asc, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from events.domain.models.event import EventDM#, EventListResponseDM
+from events.domain.models.event import EventDM
+from events.domain.exceptions.access import ActionPermissionError
+from events.domain.exceptions.event import EventNotFoundError
 from events.application.interfaces import event_interface
+from events.application.schemas.responses import event_response
 from events.infrastructure.persistence.models import Event
 
 
@@ -12,6 +15,7 @@ class EventGateway(
     event_interface.EventCreator,
     event_interface.EventUpdater,
     event_interface.EventReader,
+    event_interface.EventDeleter,
 ):
     def __init__(self, session: AsyncSession):
         self._session = session
@@ -28,13 +32,22 @@ class EventGateway(
         await self._session.commit()
 
     async def update_event(self, user_id: int, event_id: int, update_data: dict) -> None:
-        stmt = (
+        result = await self._session.execute(
+            select(Event)
+            .where(Event.id == event_id)
+        )
+        event = result.scalars().one_or_none()
+        if not event:
+            raise EventNotFoundError(f"Event not found")
+        if event.user_id != user_id:
+            raise ActionPermissionError("You are not authorized to delete this event")
+
+        await self._session.execute(
             update(Event)
             .where(Event.id == event_id, Event.user_id == user_id)
             .values(**update_data)
             .returning(Event)
         )
-        await self._session.execute(stmt)
         await self._session.commit()
 
     async def list_user_events(
@@ -45,7 +58,7 @@ class EventGateway(
             limit: int,
             offset: int,
             language: str,
-    ) -> List[EventDM]:
+    ) -> List[event_response.UserEventList]:
         sort_column = getattr(Event, sort_by, Event.created_at)
         sort_order = desc(sort_column) if order == "desc" else asc(sort_column)
         stmt = (
@@ -58,16 +71,33 @@ class EventGateway(
         )
         result = await self._session.execute(stmt)
         events = result.scalars().all()
-        # event_responses = [
-        #     EventListResponseDM(
-        #         id=event.id,
-        #         title=event.title,
-        #         description=event.description,
-        #         country=event.country.get_name(language) if event.country else None,
-        #         region=event.region.get_name(language) if event.region else None,
-        #         created_at=event.created_at,
-        #         updated_at=event.updated_at
-        #     )
-        #     for event in events
-        # ]
-        # return event_responses
+        event_responses = [
+            event_response.UserEventList(
+                id=event.id,
+                title=event.title,
+                description=event.description,
+                country=event.country.get_name(language) if event.country else None,
+                region=event.region.get_name(language) if event.region else None,
+                created_at=event.created_at,
+                updated_at=event.updated_at
+            )
+            for event in events
+        ]
+        return event_responses
+
+    async def delete_event(self, event_id: int, user_id: int) -> None:
+        result = await self._session.execute(
+            select(Event)
+            .where(Event.id == event_id)
+        )
+        event = result.scalars().one_or_none()
+        if not event:
+            raise EventNotFoundError(f"Event not found")
+        if event.user_id != user_id:
+            raise ActionPermissionError("You are not authorized to delete this event")
+
+        await self._session.execute(
+            delete(Event)
+            .where(Event.id == event_id)
+        )
+        await self._session.commit()

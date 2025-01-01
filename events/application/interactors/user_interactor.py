@@ -1,8 +1,8 @@
-from events.domain.schemas import user as schemas
 from events.domain.exceptions.user import UserNotFoundError
 from events.application.interfaces import user_interface
 from events.application.services.location_validator import LocationValidator
-from events.application.dto import user as user_dto
+from events.application.schemas.requests import user_request
+from events.application.schemas.responses import user_response
 
 
 class GetCurrentUserInteractor:
@@ -12,8 +12,8 @@ class GetCurrentUserInteractor:
     ) -> None:
         self._user_gateway = user_gateway
 
-    async def __call__(self, user_email: str, language: str) -> schemas.CurrentUser:
-        current_user = await self._user_gateway.get_current_user(email=user_email, language=language)
+    async def __call__(self, user_id: int, language: str) -> user_response.CurrentUser:
+        current_user = await self._user_gateway.get_current_user(user_id=user_id, language=language)
         if current_user:
             return current_user
         else:
@@ -29,7 +29,7 @@ class UpdateCurrentUserInteractor:
         self._user_gateway = user_gateway
         self._location_validator = location_validator
 
-    async def __call__(self, dto: user_dto.UpdateUserDTO, user_email: str) -> None:
+    async def __call__(self, dto: user_request.CurrentUserUpdate, user_id: int) -> None:
         await self._location_validator(dto.country_id, dto.region_id)
         update_data = dto.model_dump()
-        await self._user_gateway.update_user(email=user_email, update_data=update_data)
+        await self._user_gateway.update_user(user_id=user_id, update_data=update_data)

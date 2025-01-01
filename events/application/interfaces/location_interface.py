@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import Protocol, List, Optional
 
-from events.domain.schemas.location import CountryList, RegionList
+from events.application.schemas.responses import location_response
 
 
 class CountryReader(Protocol):
@@ -10,7 +10,10 @@ class CountryReader(Protocol):
         ...
 
     @abstractmethod
-    async def get_countries_list(self, language: str) -> List[CountryList]:
+    async def get_countries_list(
+            self,
+            language: str
+    ) -> List[location_response.CountryList]:
         ...
 
 
@@ -20,7 +23,11 @@ class RegionReader(Protocol):
         ...
 
     @abstractmethod
-    async def get_regions_list(self, country_id: int, language: str) -> List[RegionList]:
+    async def get_regions_list(
+            self,
+            country_id: int,
+            language: str,
+    ) -> List[location_response.RegionList]:
         ...
 
 

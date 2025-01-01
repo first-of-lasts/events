@@ -1,4 +1,3 @@
-from typing import Optional
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -44,38 +43,40 @@ class AuthGateway(
         )
         return result.scalars().one_or_none() is not None
 
-    async def create_user(self, user: UserDM) -> None:
+    async def create_user(self, user: UserDM) -> int:
         new_user = User(
             email=user.email,
             username=user.username,
             password=user.password,
         )
         self._session.add(new_user)
+        await self._session.flush()
+        return new_user.id
 
-    async def verify_user(self, email: str) -> None:
+    async def verify_user(self, user_id: int) -> None:
         await self._session.execute(
             update(User)
-            .where(User.email == email)
+            .where(User.id == user_id)
             .values(is_verified=True)
         )
         await self._session.commit()
 
-    async def change_user_password(self, email: str, new_password: str) -> None:
+    async def change_user_password(self, user_id: int, new_password: str) -> None:
         await self._session.execute(
             update(User)
-            .where(User.email == email)
+            .where(User.id == user_id)
             .values(password=new_password)
         )
         await self._session.commit()
 
-    def create_access_token(self, user_email: str) -> str:
-        return self._token_processor.create_access_token(user_email)
+    def create_access_token(self, user_id: int) -> str:
+        return self._token_processor.create_access_token(user_id)
 
-    def create_password_reset_token(self, user_email: str) -> str:
-        return self._token_processor.create_password_reset_token(user_email)
+    def create_password_reset_token(self, user_id: int) -> str:
+        return self._token_processor.create_password_reset_token(user_id)
 
-    def create_refresh_token(self, user_email: str) -> str:
-        return self._token_processor.create_refresh_token(user_email)
+    def create_refresh_token(self, user_id: int) -> str:
+        return self._token_processor.create_refresh_token(user_id)
 
-    def verify_token(self, token: str, token_type: Optional[TokenType] = None) -> str:
+    def verify_token(self, token: str, token_type: TokenType) -> int:
         return self._token_processor.verify_token(token, token_type)

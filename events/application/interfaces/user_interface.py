@@ -2,12 +2,12 @@ from abc import abstractmethod
 from typing import Protocol, Optional
 
 from events.domain.models.user import UserDM
-from events.domain.schemas.user import CurrentUser
+from events.application.schemas.responses import user_response
 
 
 class UserUpdater(Protocol):
     @abstractmethod
-    async def update_user(self, email: str, update_data: dict) -> None:
+    async def update_user(self, user_id: int, update_data: dict) -> None:
         ...
 
 
@@ -21,5 +21,9 @@ class UserReader(Protocol):
         ...
 
     @abstractmethod
-    async def get_current_user(self, email: str, language: str) -> Optional[CurrentUser]:
+    async def get_current_user(
+            self,
+            user_id: int,
+            language: str
+    ) -> Optional[user_response.CurrentUser]:
         ...

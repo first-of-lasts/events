@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import Protocol, List
 
 from events.domain.models.event import EventDM
+from events.application.schemas.responses import event_response
 
 
 class EventCreator(Protocol):
@@ -26,5 +27,11 @@ class EventReader(Protocol):
             limit: int,
             offset: int,
             language: str
-    ) -> List[EventDM]:
+    ) -> List[event_response.UserEventList]:
+        ...
+
+
+class EventDeleter(Protocol):
+    @abstractmethod
+    async def delete_event(self, event_id: int, user_id: int) -> None:
         ...

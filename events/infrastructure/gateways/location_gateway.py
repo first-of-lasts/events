@@ -2,10 +2,9 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from events.domain.models.region import RegionDM
-from events.domain.schemas.location import CountryList, RegionList
 from events.domain.exceptions.location import CountryNotFoundError
 from events.application.interfaces.location_interface import LocationGatewayInterface
+from events.application.schemas.responses import location_response
 from events.infrastructure.persistence.models import Country
 from events.infrastructure.persistence.models import Region
 
@@ -16,7 +15,7 @@ class LocationGateway(
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def exists_country_by_id(self, country_id: int) -> bool:
+    async def exists_country_by_id(self, country_id: int,) -> bool:
         result =  await self._session.execute(
             select(Country)
             .where(Country.id == country_id)
@@ -24,11 +23,14 @@ class LocationGateway(
         )
         return result.scalars().one_or_none() is not None
 
-    async def get_countries_list(self, language: str) -> List[CountryList]:
+    async def get_countries_list(
+            self,
+            language: str,
+    ) -> List[location_response.CountryList]:
         result = await self._session.execute(select(Country))
         countries = result.scalars().all()
         country_list = [
-            CountryList(
+            location_response.CountryList(
                 id=country.id,
                 code=country.code,
                 name=country.get_name(language)
@@ -47,7 +49,11 @@ class LocationGateway(
         if region:
             return region.country_id
 
-    async def get_regions_list(self, country_id: int, language: str) -> List[RegionList]:
+    async def get_regions_list(
+            self,
+            country_id: int,
+            language: str,
+    ) -> List[location_response.RegionList]:
         country_exists = await self._session.execute(
             select(Country.id)
             .where(Country.id == country_id)
@@ -60,7 +66,7 @@ class LocationGateway(
         )
         regions = result.scalars().all()
         region_list = [
-            RegionList(
+            location_response.RegionList(
                 id=region.id,
                 name=region.get_name(language)
             )

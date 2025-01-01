@@ -9,6 +9,6 @@ class CurrentUser(BaseModel):
     id: int
     email: str
     username: str
-    bio: str
+    bio: Optional[str]
     country: Optional[CountryDM] = None
     region: Optional[RegionDM] = None

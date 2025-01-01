@@ -17,6 +17,7 @@ class Event(Base):
     country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"), nullable=False)
     region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"), nullable=True)
     # Relationships
-    creator = relationship("User", back_populates="events")
-    country = relationship("Country", back_populates="events")
-    region = relationship("Region", back_populates="events")
+    creator = relationship(argument="User", back_populates="events")
+    country = relationship(argument="Country", back_populates="events")
+    region = relationship(argument="Region", back_populates="events")
+    attendees = relationship(argument="EventAttendee", back_populates="attendees")

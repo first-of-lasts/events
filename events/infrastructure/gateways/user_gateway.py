@@ -6,8 +6,8 @@ from sqlalchemy.orm import selectinload
 from events.domain.models.region import RegionDM
 from events.domain.models.country import CountryDM
 from events.domain.models.user import UserDM
-from events.domain.schemas.user import CurrentUser
 from events.application.interfaces import user_interface
+from events.application.schemas.responses import user_response
 from events.infrastructure.persistence.models.user import User
 
 
@@ -42,17 +42,19 @@ class UserGateway(
         if user:
             return UserDM(
                 id=user.id,
-                username=user.username,
-                email=user.email,
                 password=user.password,
                 is_verified=user.is_verified,
                 is_active=user.is_active,
             )
 
-    async def get_current_user(self, email: str, language: str) -> Optional[CurrentUser]:
+    async def get_current_user(
+            self,
+            user_id: int,
+            language: str
+    ) -> Optional[user_response.CurrentUser]:
         result = await self._session.execute(
             select(User)
-            .where(User.email == email, User.is_verified == True, User.is_active == True)
+            .where(User.id == user_id, User.is_verified == True, User.is_active == True)
             .options(selectinload(User.country), selectinload(User.region))
             .limit(1)
         )
@@ -71,7 +73,7 @@ class UserGateway(
                     id=user.region.id,
                     name=user.region.get_name(language),
                 )
-            return CurrentUser(
+            return user_response.CurrentUser(
                 id=user.id,
                 username=user.username,
                 email=user.email,
@@ -80,10 +82,10 @@ class UserGateway(
                 region=region_dm,
             )
 
-    async def update_user(self, email: str, update_data: dict) -> None:
+    async def update_user(self, user_id: int, update_data: dict) -> None:
         await self._session.execute(
             update(User)
-            .where(User.email == email)
+            .where(User.id == user_id)
             .values(**update_data)
         )
         await self._session.commit()

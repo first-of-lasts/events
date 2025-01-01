@@ -1,10 +1,9 @@
 from typing import Optional
+from pydantic import BaseModel, field_validator, Field
 
-from pydantic import BaseModel, Field, field_validator
 
-
-class UpdateUserDTO(BaseModel):
-    bio: str = Field(max_length=1024)
+class CurrentUserUpdate(BaseModel):
+    bio: str = Field(None, max_length=1024)
     country_id: int
     region_id: Optional[int] = None
 

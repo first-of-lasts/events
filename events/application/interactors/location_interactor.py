@@ -1,7 +1,7 @@
 from typing import List
 
-from events.domain.schemas.location import CountryList, RegionList
 from events.application.interfaces import location_interface
+from events.application.schemas.responses import location_response
 
 
 class ListCountriesInteractor:
@@ -11,7 +11,10 @@ class ListCountriesInteractor:
     ) -> None:
         self._location_gateway = location_gateway
 
-    async def __call__(self, language: str) -> List[CountryList]:
+    async def __call__(
+            self,
+            language: str
+    ) -> List[location_response.CountryList]:
         countries = await self._location_gateway.get_countries_list(language)
         return countries
 
@@ -23,6 +26,10 @@ class ListRegionsInteractor:
     ) -> None:
         self._location_gateway = location_gateway
 
-    async def __call__(self, country_id: int, language: str) -> List[RegionList]:
+    async def __call__(
+            self,
+            country_id: int,
+            language: str
+    ) -> List[location_response.RegionList]:
         regions = await self._location_gateway.get_regions_list(country_id, language)
         return regions
