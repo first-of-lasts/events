@@ -60,7 +60,7 @@ class ListUserEventsInteractor:
             user_id: int,
             language: str,
     ) -> List[event_response.UserEventList]:
-        return await self._event_gateway.list_user_events(
+        return await self._event_gateway.get_user_events_list(
             user_id=user_id,
             sort_by=dto.sort_by,
             order=dto.order,

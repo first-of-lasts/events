@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, DateTime, func
+from sqlalchemy import String, ForeignKey, DateTime, func, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from events.infrastructure.persistence.manager import Base
@@ -12,6 +12,8 @@ class Event(Base):
     description: Mapped[str] = mapped_column(String(2048), nullable=False)
     starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    is_occurred: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_deleted: Mapped[bool] = mapped_column(Boolean, default=False)
     #
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
@@ -23,4 +25,4 @@ class Event(Base):
     creator = relationship(argument="User", back_populates="events")
     country = relationship(argument="Country", back_populates="events")
     region = relationship(argument="Region", back_populates="events")
-    attendees = relationship(argument="EventAttendee", back_populates="attendees")
+    attendees = relationship(argument="Attendee", back_populates="attendees")

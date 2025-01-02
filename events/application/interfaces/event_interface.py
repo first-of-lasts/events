@@ -19,7 +19,7 @@ class EventUpdater(Protocol):
 
 class EventReader(Protocol):
     @abstractmethod
-    async def list_user_events(
+    async def get_user_events_list(
             self,
             user_id: int,
             sort_by: str,

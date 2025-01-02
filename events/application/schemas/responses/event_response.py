@@ -9,5 +9,6 @@ class UserEventList(BaseModel):
     description: str
     starts_at: datetime
     ends_at: datetime
+    is_occurred: bool
     country: str
     region: Optional[str] = None

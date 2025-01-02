@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, Literal
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class UserEventListFilter(BaseModel):
@@ -15,8 +15,17 @@ class EventCreate(BaseModel):
     description: str = Field(max_length=2048)
     starts_at: datetime
     ends_at: datetime
-    country_id: Optional[int] = None
+    country_id: int
     region_id: Optional[int] = None
+
+    @model_validator(mode="after")
+    def check_dates(cls, values):
+        current_time = datetime.now(timezone.utc)
+        if values.starts_at >= values.ends_at:
+            raise ValueError("'starts_at' must be earlier than 'ends_at'.")
+        if values.starts_at <= current_time:
+            raise ValueError("'starts_at' must be in the future.")
+        return values
 
 
 class EventUpdate(BaseModel):
@@ -26,3 +35,12 @@ class EventUpdate(BaseModel):
     ends_at: datetime
     country_id: int
     region_id: Optional[int] = None
+
+    @model_validator(mode="after")
+    def check_dates(cls, values):
+        current_time = datetime.now(timezone.utc)
+        if values.starts_at >= values.ends_at:
+            raise ValueError("'starts_at' must be earlier than 'ends_at'.")
+        if values.starts_at <= current_time:
+            raise ValueError("'starts_at' must be in the future.")
+        return values

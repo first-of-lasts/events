@@ -8,6 +8,7 @@ from events.main.ioc.providers.auth import AuthProvider
 from events.main.ioc.providers.user import UserProvider
 from events.main.ioc.providers.location import LocationProvider
 from events.main.ioc.providers.event import EventProvider
+from events.main.ioc.providers.attendee import AttendeeProvider
 
 
 def get_providers() -> list[Provider]:
@@ -17,6 +18,7 @@ def get_providers() -> list[Provider]:
         UserProvider(),
         LocationProvider(),
         EventProvider(),
+        AttendeeProvider(),
     ]
     return providers
 
