@@ -13,15 +13,15 @@ class UserUpdater(Protocol):
 
 class UserReader(Protocol):
     @abstractmethod
-    async def get_by_email(self, email: str) -> Optional[UserDM]:
+    async def get_user(self, email: str) -> Optional[UserDM]:
         ...
 
     @abstractmethod
-    async def get_by_email_for_login(self, email: str) -> Optional[UserDM]:
+    async def get_login_user(self, email: str) -> Optional[UserDM]:
         ...
 
     @abstractmethod
-    async def get_current_user(
+    async def get_detailed_user(
             self,
             user_id: int,
             language: str

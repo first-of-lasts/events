@@ -25,6 +25,8 @@ class EventGateway(
             user_id=event.user_id,
             title=event.title,
             description=event.description,
+            starts_at=event.starts_at,
+            ends_at=event.ends_at,
             country_id=event.country_id,
             region_id=event.region_id,
         )
@@ -76,10 +78,10 @@ class EventGateway(
                 id=event.id,
                 title=event.title,
                 description=event.description,
+                starts_at=event.starts_at,
+                ends_at=event.ends_at,
                 country=event.country.get_name(language) if event.country else None,
                 region=event.region.get_name(language) if event.region else None,
-                created_at=event.created_at,
-                updated_at=event.updated_at
             )
             for event in events
         ]

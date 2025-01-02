@@ -89,7 +89,7 @@ class LoginInteractor:
         self._token_processor = token_processor
 
     async def __call__(self, dto: auth_request.Login) -> dict:
-        user = await self._user_gateway.get_by_email_for_login(str(dto.email))
+        user = await self._user_gateway.get_login_user(str(dto.email))
         if user and user.is_verified and user.is_active:
             if not verify_password(dto.password, user.password):
                 raise AuthenticationError("Invalid credentials")
@@ -117,7 +117,7 @@ class PasswordResetInteractor:
         self._translations = translations
 
     async def __call__(self, dto: auth_request.PasswordReset, language: str) -> None:
-        user = await self._user_gateway.get_by_email(str(dto.email))
+        user = await self._user_gateway.get_user(str(dto.email))
         if user:
             await self._send_reset_email(user_id=user.id, email=str(dto.email), language=language)
 

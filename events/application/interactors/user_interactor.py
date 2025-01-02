@@ -13,7 +13,7 @@ class GetCurrentUserInteractor:
         self._user_gateway = user_gateway
 
     async def __call__(self, user_id: int, language: str) -> user_response.CurrentUser:
-        current_user = await self._user_gateway.get_current_user(user_id=user_id, language=language)
+        current_user = await self._user_gateway.get_detailed_user(user_id=user_id, language=language)
         if current_user:
             return current_user
         else:

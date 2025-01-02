@@ -18,7 +18,7 @@ class UserGateway(
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_by_email(self, email: str) -> Optional[UserDM]:
+    async def get_user(self, email: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_active == True)
@@ -32,7 +32,7 @@ class UserGateway(
                 email=user.email,
             )
 
-    async def get_by_email_for_login(self, email: str) -> Optional[UserDM]:
+    async def get_login_user(self, email: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_active == True)
@@ -47,7 +47,7 @@ class UserGateway(
                 is_active=user.is_active,
             )
 
-    async def get_current_user(
+    async def get_detailed_user(
             self,
             user_id: int,
             language: str

@@ -22,6 +22,8 @@ class CreateEventInteractor:
             user_id=user_id,
             title=dto.title,
             description=dto.description,
+            starts_at=dto.starts_at,
+            ends_at=dto.ends_at,
             country_id=dto.country_id,
             region_id=dto.region_id,
         )
