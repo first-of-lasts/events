@@ -1,5 +1,5 @@
 from typing import List, Optional
-from sqlalchemy import select
+from sqlalchemy import select, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from events.domain.exceptions.location import CountryNotFoundError
@@ -27,7 +27,10 @@ class LocationGateway(
             self,
             language: str,
     ) -> List[location_response.CountryList]:
-        result = await self._session.execute(select(Country))
+        result = await self._session.execute(
+            select(Country)
+            .order_by(asc(getattr(Country, f"name_{language}")))
+        )
         countries = result.scalars().all()
         country_list = [
             location_response.CountryList(
@@ -63,6 +66,7 @@ class LocationGateway(
         result = await self._session.execute(
             select(Region)
             .where(Region.country_id == country_id)
+            .order_by(asc(getattr(Region, f"name_{language}")))
         )
         regions = result.scalars().all()
         region_list = [

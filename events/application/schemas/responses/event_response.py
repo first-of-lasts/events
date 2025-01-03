@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 
@@ -9,9 +9,10 @@ class UserEventList(BaseModel):
     description: str
     starts_at: datetime
     ends_at: datetime
-    is_occurred: bool
+    categories: List[str]
     country: str
     region: Optional[str] = None
+    is_occurred: bool
 
 
 class CategoryList(BaseModel):

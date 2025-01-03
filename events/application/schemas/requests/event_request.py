@@ -34,6 +34,7 @@ class EventUpdate(BaseModel):
     description: str = Field(max_length=2048)
     starts_at: datetime
     ends_at: datetime
+    category_ids: List[int] = Field(min_items=1)
     country_id: int
     region_id: Optional[int] = None
 

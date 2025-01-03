@@ -5,5 +5,5 @@ class EventNotFoundError(DomainError):
     ...
 
 
-class EventCategoryNotFound(DomainError):
+class EventCategoryNotFoundError(DomainError):
     ...
