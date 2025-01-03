@@ -20,16 +20,12 @@ class Attendee(Base):
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, )
-    status: Mapped[AttendanceStatus] = mapped_column(
-        Enum(AttendanceStatus),
-        default=AttendanceStatus.pending,
-        nullable=False,
-    )
+    status: Mapped[AttendanceStatus] = mapped_column(Enum(AttendanceStatus), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
     # Foreign Keys
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     # Relationships
-    # attendees = relationship(argument="Event", back_populates="attendees")
-    # attended_events = relationship(argument="User", back_populates="attended_events")
+    attendees = relationship(argument="Event", back_populates="attendees")
+    attended_events = relationship(argument="User", back_populates="attended_events")

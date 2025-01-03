@@ -1,5 +1,5 @@
-from typing import List
-from sqlalchemy import select, update, desc, asc
+from typing import List, Optional
+from sqlalchemy import select, update, desc, asc, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -75,12 +75,12 @@ class EventGateway(
 
     async def get_user_events_list(
             self,
+            language: str,
             user_id: int,
-            sort_by: str,
-            order: str,
             limit: int,
             offset: int,
-            language: str,
+            sort_by: str,
+            order: str,
     ) -> List[event_response.UserEventList]:
         sort_column = getattr(Event, sort_by, Event.created_at)
         sort_order = desc(sort_column) if order == "desc" else asc(sort_column)
@@ -116,6 +116,56 @@ class EventGateway(
             for event in events
         ]
         return event_responses
+
+    async def get_recommended_events_list(
+            self,
+            language: str,
+            user_id: int,
+            limit: int,
+            offset: int,
+            category_ids: Optional[List[int]],
+            country_id: Optional[int],
+            region_id: Optional[int],
+    ) -> List[event_response.RecommendedEventList]:
+        conditions = [
+            Event.is_deleted == False,
+            Event.is_occurred == False,
+            Event.user_id !=  user_id,
+        ]
+        if country_id:
+            conditions.append(Event.country_id == country_id)
+        if region_id:
+            conditions.append(Event.region_id == region_id)
+        if category_ids:
+            conditions.append(Event.categories.any(EventCategory.id.in_(category_ids)))
+        stmt = (
+            select(Event)
+            .options(
+                selectinload(Event.country),
+                selectinload(Event.region),
+                selectinload(Event.categories)
+            )
+            .where(and_(*conditions))
+            .order_by(asc(Event.starts_at))
+            .offset(offset)
+            .limit(limit)
+        )
+        result = await self._session.execute(stmt)
+        events = result.scalars().all()
+        recommended_events = [
+            event_response.RecommendedEventList(
+                id=event.id,
+                title=event.title,
+                description=event.description,
+                starts_at=event.starts_at,
+                ends_at=event.ends_at,
+                categories=[category.get_name(language) for category in event.categories],
+                country=event.country.get_name(language),
+                region=event.region.get_name(language) if event.region else None,
+            )
+            for event in events
+        ]
+        return recommended_events
 
     async def delete_event(self, event_id: int, user_id: int) -> None:
         result = await self._session.execute(

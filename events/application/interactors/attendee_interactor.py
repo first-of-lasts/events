@@ -16,6 +16,7 @@ class CreateAttendeeInteractor:
 
     async def __call__(self, dto: attendee_request.AttendeeCreate, user_id: int) -> None:
         new_attendee = AttendeeDM(
-
+            event_id=dto.event_id,
+            user_id=user_id,
         )
         await self._attendee_gateway.create_attendee(new_attendee)

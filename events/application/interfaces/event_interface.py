@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Protocol, List
+from typing import Protocol, List, Optional
 
 from events.domain.models.event import EventDM
 from events.application.schemas.responses import event_response
@@ -21,13 +21,26 @@ class EventReader(Protocol):
     @abstractmethod
     async def get_user_events_list(
             self,
+            language: str,
             user_id: int,
-            sort_by: str,
-            order: str,
             limit: int,
             offset: int,
-            language: str
+            sort_by: str,
+            order: str,
     ) -> List[event_response.UserEventList]:
+        ...
+
+    @abstractmethod
+    async def get_recommended_events_list(
+            self,
+            language: str,
+            user_id: int,
+            limit: int,
+            offset: int,
+            category_ids: Optional[List[int]],
+            country_id: Optional[int],
+            region_id: Optional[int],
+    ) -> List[event_response.RecommendedEventList]:
         ...
 
 

@@ -4,4 +4,5 @@ from typing import Optional
 
 @dataclass(slots=True)
 class AttendeeDM:
-    id: Optional[int] = None
+    event_id: int
+    user_id: int

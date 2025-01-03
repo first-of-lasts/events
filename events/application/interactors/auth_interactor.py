@@ -117,7 +117,7 @@ class PasswordResetInteractor:
         self._translations = translations
 
     async def __call__(self, dto: auth_request.PasswordReset, language: str) -> None:
-        user = await self._user_gateway.get_user(str(dto.email))
+        user = await self._user_gateway.get_user_by_email(str(dto.email))
         if user:
             await self._send_reset_email(user_id=user.id, email=str(dto.email), language=language)
 

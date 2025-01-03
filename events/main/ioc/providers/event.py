@@ -1,6 +1,7 @@
 from dishka import Provider, provide, Scope, AnyOf
 
 from events.application.interfaces import event_interface
+from events.application.interfaces import user_interface
 from events.application.interactors import event_interactor
 from events.application.services.location_validator import LocationValidator
 from events.infrastructure.gateways.event_gateway import EventGateway
@@ -51,6 +52,17 @@ class EventProvider(Provider):
         )
 
     @provide(scope=Scope.REQUEST)
+    def list_recommended_events_interactor(
+            self,
+            event_gateway: event_interface.EventReader,
+            user_gateway: user_interface.UserReader,
+    ) -> event_interactor.ListRecommendedEventsInteractor:
+        return event_interactor.ListRecommendedEventsInteractor(
+            event_gateway=event_gateway,
+            user_gateway=user_gateway,
+        )
+
+    @provide(scope=Scope.REQUEST)
     def delete_event_interactor(
             self,
             event_gateway: event_interface.EventDeleter,
@@ -67,3 +79,5 @@ class EventProvider(Provider):
         return event_interactor.ListCategoriesInteractor(
             event_gateway=event_gateway,
         )
+
+

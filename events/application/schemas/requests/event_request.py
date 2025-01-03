@@ -10,7 +10,7 @@ class UserEventListFilter(BaseModel):
     order: Literal["asc", "desc"] = Field(default="asc")
 
 
-class EventCreate(BaseModel):
+class EventBase(BaseModel):
     title: str
     description: str = Field(max_length=2048)
     starts_at: datetime
@@ -28,21 +28,17 @@ class EventCreate(BaseModel):
             raise ValueError("'starts_at' must be in the future.")
         return values
 
+class EventCreate(EventBase):
+    ...
 
-class EventUpdate(BaseModel):
-    title: str
-    description: str = Field(max_length=2048)
-    starts_at: datetime
-    ends_at: datetime
-    category_ids: List[int] = Field(min_items=1)
-    country_id: int
+
+class EventUpdate(EventBase):
+    ...
+
+
+class RecommendedEventListFilter(BaseModel):
+    limit: int = Field(ge=1, le=100)
+    offset: int = Field(ge=0)
+    country_id: Optional[int] = None
     region_id: Optional[int] = None
-
-    @model_validator(mode="after")
-    def check_dates(cls, values):
-        current_time = datetime.now(timezone.utc)
-        if values.starts_at >= values.ends_at:
-            raise ValueError("'starts_at' must be earlier than 'ends_at'.")
-        if values.starts_at <= current_time:
-            raise ValueError("'starts_at' must be in the future.")
-        return values
+    category_ids: Optional[List[int]] = None

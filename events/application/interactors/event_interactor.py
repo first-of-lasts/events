@@ -1,9 +1,11 @@
 from typing import List
 
+from events.domain.exceptions.access import AuthenticationError
 from events.domain.models.event import EventDM
 from events.application.schemas.requests import event_request
 from events.application.schemas.responses import event_response
 from events.application.interfaces import event_interface
+from events.application.interfaces import user_interface
 from events.application.services.location_validator import LocationValidator
 
 
@@ -62,12 +64,12 @@ class ListUserEventsInteractor:
             language: str,
     ) -> List[event_response.UserEventList]:
         return await self._event_gateway.get_user_events_list(
+            language=language,
             user_id=user_id,
-            sort_by=dto.sort_by,
-            order=dto.order,
             limit=dto.limit,
             offset=dto.offset,
-            language=language,
+            sort_by=dto.sort_by,
+            order=dto.order,
         )
 
 
@@ -97,3 +99,34 @@ class ListCategoriesInteractor:
     ) -> List[event_response.CategoryList]:
         categories = await self._event_gateway.get_categories_list(language)
         return categories
+
+
+class ListRecommendedEventsInteractor:
+    def __init__(
+            self,
+            event_gateway: event_interface.EventReader,
+            user_gateway: user_interface.UserReader,
+    ):
+        self._event_gateway = event_gateway
+        self._user_gateway = user_gateway
+
+    async def __call__(
+            self,
+            dto: event_request.RecommendedEventListFilter,
+            user_id: int,
+            language: str,
+    ) -> List[event_response.RecommendedEventList]:
+        if not dto.country_id:
+            user = await self._user_gateway.get_user_by_id(user_id)
+            if not user:
+                raise AuthenticationError("User not found")
+            dto.country_id = user.country_id
+        return await self._event_gateway.get_recommended_events_list(
+            language=language,
+            user_id=user_id,
+            limit=dto.limit,
+            offset=dto.offset,
+            category_ids=dto.category_ids,
+            country_id=dto.country_id,
+            region_id=dto.region_id,
+        )

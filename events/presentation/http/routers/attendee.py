@@ -14,7 +14,7 @@ from events.presentation.http.dependencies.language import get_valid_language
 attendee_router = APIRouter()
 
 
-@attendee_router.post("/")
+@attendee_router.post("")
 @inject
 async def create_attendee(
         data: attendee_request.AttendeeCreate,

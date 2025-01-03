@@ -18,7 +18,7 @@ class UserGateway(
     def __init__(self, session: AsyncSession):
         self._session = session
 
-    async def get_user(self, email: str) -> Optional[UserDM]:
+    async def get_user_by_email(self, email: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
             .where(User.email == email, User.is_verified == True, User.is_blacklisted == False)
@@ -30,6 +30,20 @@ class UserGateway(
                 id=user.id,
                 email=user.email,
                 username=user.username,
+            )
+
+    async def get_user_by_id(self, user_id) -> Optional[UserDM]:
+        result = await self._session.execute(
+            select(User)
+            .where(User.id == user_id, User.is_verified == True, User.is_blacklisted == False)
+            .limit(1)
+        )
+        user = result.scalars().one_or_none()
+        if user:
+            return UserDM(
+                id=user.id,
+                country_id=user.country_id if user.country_id else None,
+                region_id=user.region_id if user.region_id else None,
             )
 
     async def get_login_user(self, email: str) -> Optional[UserDM]:

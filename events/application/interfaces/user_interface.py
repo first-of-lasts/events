@@ -13,7 +13,11 @@ class UserUpdater(Protocol):
 
 class UserReader(Protocol):
     @abstractmethod
-    async def get_user(self, email: str) -> Optional[UserDM]:
+    async def get_user_by_email(self, email: str) -> Optional[UserDM]:
+        ...
+
+    @abstractmethod
+    async def get_user_by_id(self, user_id: int) -> Optional[UserDM]:
         ...
 
     @abstractmethod

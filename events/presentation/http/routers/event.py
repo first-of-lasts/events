@@ -69,3 +69,15 @@ async def list_categories(
 ):
     categories = await interactor(language=language)
     return categories
+
+
+@event_router.get("/recommended-events")
+@inject
+async def get_recommended_events(
+        interactor: FromDishka[event_interactor.ListRecommendedEventsInteractor],
+        dto: event_request.RecommendedEventListFilter = Depends(),
+        user_id: int = Depends(get_user_id),
+        language: str = Depends(get_valid_language),
+):
+    recommended_events = await interactor(dto=dto, user_id=user_id, language=language)
+    return recommended_events
