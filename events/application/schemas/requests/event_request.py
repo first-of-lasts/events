@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -15,6 +15,7 @@ class EventCreate(BaseModel):
     description: str = Field(max_length=2048)
     starts_at: datetime
     ends_at: datetime
+    category_ids: List[int] = Field(min_items=1)
     country_id: int
     region_id: Optional[int] = None
 

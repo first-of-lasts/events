@@ -24,6 +24,7 @@ class CreateEventInteractor:
             description=dto.description,
             starts_at=dto.starts_at,
             ends_at=dto.ends_at,
+            category_ids=dto.category_ids,
             country_id=dto.country_id,
             region_id=dto.region_id,
         )
@@ -81,3 +82,18 @@ class DeleteEventInteractor:
         await self._event_gateway.delete_event(
             event_id=event_id, user_id=user_id
         )
+
+
+class ListCategoriesInteractor:
+    def __init__(
+            self,
+            event_gateway: event_interface.CategoryReader,
+    ):
+        self._event_gateway = event_gateway
+
+    async def __call__(
+            self,
+            language: str
+    ) -> List[event_response.CategoryList]:
+        categories = await self._event_gateway.get_categories_list(language)
+        return categories

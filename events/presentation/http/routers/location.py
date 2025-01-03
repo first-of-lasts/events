@@ -20,7 +20,8 @@ async def list_countries(
         user_id: int = Depends(get_user_id),
         language: str = Depends(get_valid_language),
 ) -> List[location_response.CountryList]:
-    return await interactor(language=language)
+    countries = await interactor(language=language)
+    return countries
 
 
 @location_router.get("/countries/{country_id}/regions")
@@ -31,4 +32,5 @@ async def list_regions(
         user_id: int = Depends(get_user_id),
         language: str = Depends(get_valid_language),
 ) -> List[location_response.RegionList]:
-    return await interactor(country_id=country_id, language=language)
+    regions = await interactor(country_id=country_id, language=language)
+    return regions

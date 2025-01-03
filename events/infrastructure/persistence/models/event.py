@@ -1,6 +1,6 @@
 from datetime import datetime
 from sqlalchemy import String, ForeignKey, DateTime, func, Boolean, \
-    Integer, Column
+    Integer, Column, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from events.infrastructure.persistence.manager import Base
@@ -18,19 +18,20 @@ class EventEventCategory(Base):
 
 class EventCategory(Base):
     __tablename__ = "event_categories"
+    __table_args__ = (
+        UniqueConstraint("sort_order", name="_sort_order_uc"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, )
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, )
     for lang in load_supported_languages():
         locals()[f"name_{lang}"] = mapped_column(String(255), nullable=True)
     # Relationships
-    # events = relationship(
-    #     argument="Event",
-    #     secondary="event_event_category",
-    #     back_populates="categories",
-    #     order_by="EventCategory.sort_order",
-    # )
+    # events = relationship(argument="Event", secondary="event_event_category", back_populates="categories", order_by="EventCategory.sort_order", )
     event_event_categories = relationship(argument="EventEventCategory", back_populates="event_category")
+
+    def get_name(self, language: str) -> str:
+        return getattr(self, f"name_{language}", "")
 
 
 class Event(Base):
@@ -51,12 +52,7 @@ class Event(Base):
     country_id: Mapped[int] = mapped_column(ForeignKey("countries.id"), nullable=False)
     region_id: Mapped[int] = mapped_column(ForeignKey("regions.id"), nullable=True)
     # Relationships
-    # categories = relationship(
-    #     argument="EventCategory",
-    #     secondary="event_event_category",
-    #     back_populates="events",
-    #     order_by="EventCategory.sort_order",
-    # )
+    # categories = relationship(argument="EventCategory", secondary="event_event_category", back_populates="events", order_by="EventCategory.sort_order", )
     event_event_categories = relationship(argument="EventEventCategory", back_populates="event")
     #
     creator = relationship(argument="User", back_populates="events")

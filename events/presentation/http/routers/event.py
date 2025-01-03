@@ -58,3 +58,14 @@ async def delete_event(
 ):
     await interactor(user_id=user_id, event_id=event_id)
     return {"message": "Event deleted successfully"}
+
+
+@event_router.get("/categories")
+@inject
+async def list_categories(
+        interactor: FromDishka[event_interactor.ListCategoriesInteractor],
+        user_id: int = Depends(get_user_id),
+        language: str = Depends(get_valid_language),
+):
+    categories = await interactor(language=language)
+    return categories

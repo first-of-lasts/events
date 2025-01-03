@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from events.domain.models.user import UserDM
 from events.application.interfaces import auth_interface
-from events.infrastructure.persistence.models.user import User
+from events.infrastructure.persistence.models import User
 from events.infrastructure.auth.token import JwtTokenProcessor, TokenType
 
 

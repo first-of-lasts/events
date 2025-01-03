@@ -35,3 +35,12 @@ class EventDeleter(Protocol):
     @abstractmethod
     async def delete_event(self, event_id: int, user_id: int) -> None:
         ...
+
+
+class CategoryReader(Protocol):
+    @abstractmethod
+    async def get_categories_list(
+            self,
+            language: str
+    ) -> List[event_response.CategoryList]:
+        ...

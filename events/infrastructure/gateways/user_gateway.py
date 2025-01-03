@@ -8,7 +8,7 @@ from events.domain.models.country import CountryDM
 from events.domain.models.user import UserDM
 from events.application.interfaces import user_interface
 from events.application.schemas.responses import user_response
-from events.infrastructure.persistence.models.user import User
+from events.infrastructure.persistence.models import User
 
 
 class UserGateway(
@@ -28,8 +28,8 @@ class UserGateway(
         if user:
             return UserDM(
                 id=user.id,
-                username=user.username,
                 email=user.email,
+                username=user.username,
             )
 
     async def get_login_user(self, email: str) -> Optional[UserDM]:
@@ -75,8 +75,8 @@ class UserGateway(
                 )
             return user_response.CurrentUser(
                 id=user.id,
-                username=user.username,
                 email=user.email,
+                username=user.username,
                 bio=user.bio,
                 country=country_dm,
                 region=region_dm,

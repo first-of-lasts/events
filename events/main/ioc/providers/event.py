@@ -15,6 +15,7 @@ class EventProvider(Provider):
             event_interface.EventUpdater,
             event_interface.EventReader,
             event_interface.EventDeleter,
+            event_interface.CategoryReader,
         ]
     )
 
@@ -55,5 +56,14 @@ class EventProvider(Provider):
             event_gateway: event_interface.EventDeleter,
     ) -> event_interactor.DeleteEventInteractor:
         return event_interactor.DeleteEventInteractor(
+            event_gateway=event_gateway,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def list_categories_interactor(
+            self,
+            event_gateway: event_interface.CategoryReader,
+    ) -> event_interactor.ListCategoriesInteractor:
+        return event_interactor.ListCategoriesInteractor(
             event_gateway=event_gateway,
         )

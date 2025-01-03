@@ -8,7 +8,7 @@ from events.domain.exceptions.access import ActionPermissionError
 from events.domain.exceptions.event import EventNotFoundError
 from events.application.interfaces import event_interface
 from events.application.schemas.responses import event_response
-from events.infrastructure.persistence.models import Event
+from events.infrastructure.persistence.models import Event, EventCategory
 
 
 class EventGateway(
@@ -16,6 +16,7 @@ class EventGateway(
     event_interface.EventUpdater,
     event_interface.EventReader,
     event_interface.EventDeleter,
+    event_interface.CategoryReader,
 ):
     def __init__(self, session: AsyncSession):
         self._session = session
@@ -106,3 +107,23 @@ class EventGateway(
             .values(is_deleted=True)
         )
         await self._session.commit()
+
+    async def get_categories_list(
+            self,
+            language: str,
+    ) -> List[event_response.CategoryList]:
+        result = await self._session.execute(
+            select(EventCategory)
+            .order_by(
+                asc(EventCategory.sort_order)
+            )
+        )
+        categories = result.scalars().all()
+        category_list = [
+            event_response.CategoryList(
+                id=category.id,
+                name=category.get_name(language)
+            )
+            for category in categories
+        ]
+        return category_list

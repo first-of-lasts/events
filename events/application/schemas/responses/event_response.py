@@ -12,3 +12,8 @@ class UserEventList(BaseModel):
     is_occurred: bool
     country: str
     region: Optional[str] = None
+
+
+class CategoryList(BaseModel):
+    id: int
+    name: str
