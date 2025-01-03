@@ -15,6 +15,7 @@ class CreateAttendeeInteractor:
         self._attendee_gateway = attendee_gateway
 
     async def __call__(self, dto: attendee_request.AttendeeCreate, user_id: int) -> None:
+        # TODO by check if event is not deleted, is not is_occurred, is not current_user's
         new_attendee = AttendeeDM(
             event_id=dto.event_id,
             user_id=user_id,

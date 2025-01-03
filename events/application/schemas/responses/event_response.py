@@ -15,6 +15,10 @@ class UserEventList(BaseModel):
     is_occurred: bool
 
 
+class EventDetail(BaseModel):
+    pass
+
+
 class RecommendedEventList(BaseModel):
     id: int
     title: str

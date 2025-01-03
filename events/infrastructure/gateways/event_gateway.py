@@ -4,6 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from events.domain.models.event import EventDM
+from events.domain.models.country import CountryDM
+from events.domain.models.region import RegionDM
 from events.domain.exceptions.access import ActionPermissionError
 from events.domain.exceptions.event import EventNotFoundError, EventCategoryNotFoundError
 from events.application.interfaces import event_interface
@@ -65,13 +67,47 @@ class EventGateway(
             raise ActionPermissionError("Event can not be updated")
         if event.user_id != user_id:
             raise ActionPermissionError("You can not update this event")
-        event.categories = categories
+        event.categories = categories # TODO check how works
         await self._session.execute(
             update(Event)
             .where(Event.id == event_id, Event.user_id == user_id)
             .values(**update_data)
         )
         await self._session.commit()
+
+    async def get_event(self, event_id: int) -> Optional[EventDM]:
+        pass
+
+    async def get_detailed_event(
+            self,
+            event_id: int,
+            language: str,
+    ) -> Optional[event_response.EventDetail]:
+        result = await self._session.execute(
+            select(Event)
+            .where(Event.id == event_id, Event.is_deleted == False)
+            .options(selectinload(Event.country), selectinload(Event.region), selectinload(Event.categories))
+            .limit(1)
+        )
+        event = result.scalars().one_or_none()
+        if event:
+            country_dm = None
+            if event.country:
+                country_dm = CountryDM(
+                    id=event.country.id,
+                    code=event.country.code,
+                    name=event.country.get_name(language)
+                )
+                region_dm = None
+            if event.region:
+                region_dm = RegionDM(
+                    id=event.region.id,
+                    name=event.region.get_name(language),
+                )
+            # TODO get categories
+            return event_response.EventDetail(
+
+            )
 
     async def get_user_events_list(
             self,

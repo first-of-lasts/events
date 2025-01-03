@@ -19,6 +19,18 @@ class EventUpdater(Protocol):
 
 class EventReader(Protocol):
     @abstractmethod
+    async def get_event(self, event_id: int) -> Optional[EventDM]:
+        ...
+
+    @abstractmethod
+    async def get_detailed_event(
+            self,
+            event_id: int,
+            language: str,
+    ) -> Optional[event_response.EventDetail]:
+        ...
+
+    @abstractmethod
     async def get_user_events_list(
             self,
             language: str,
