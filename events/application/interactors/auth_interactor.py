@@ -90,7 +90,7 @@ class LoginInteractor:
 
     async def __call__(self, dto: auth_request.Login) -> dict:
         user = await self._user_gateway.get_login_user(str(dto.email))
-        if user and user.is_verified and user.is_active:
+        if (user and user.is_verified) and (not user.is_blacklisted):
             if not verify_password(dto.password, user.password):
                 raise AuthenticationError("Invalid credentials")
         else:

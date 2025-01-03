@@ -1,7 +1,5 @@
-from sqlalchemy import String
+from sqlalchemy import String, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-
 
 from events.infrastructure.persistence.manager import Base
 from events.infrastructure.persistence.config import load_supported_languages
@@ -10,6 +8,7 @@ from events.infrastructure.persistence.config import load_supported_languages
 class Country(Base):
     __tablename__ = "countries"
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, )
     for lang in load_supported_languages():
         locals()[f"name_{lang}"] = mapped_column(String(255), nullable=True)
     code: Mapped[str] = mapped_column(String(10), unique=True, nullable=False)

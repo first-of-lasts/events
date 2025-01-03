@@ -21,7 +21,7 @@ class UserGateway(
     async def get_user(self, email: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
-            .where(User.email == email, User.is_verified == True, User.is_active == True)
+            .where(User.email == email, User.is_verified == True, User.is_blacklisted == False)
             .limit(1)
         )
         user = result.scalars().one_or_none()
@@ -35,7 +35,7 @@ class UserGateway(
     async def get_login_user(self, email: str) -> Optional[UserDM]:
         result = await self._session.execute(
             select(User)
-            .where(User.email == email, User.is_verified == True, User.is_active == True)
+            .where(User.email == email, User.is_verified == True, User.is_blacklisted == False)
             .limit(1)
         )
         user = result.scalars().one_or_none()
@@ -44,7 +44,7 @@ class UserGateway(
                 id=user.id,
                 password=user.password,
                 is_verified=user.is_verified,
-                is_active=user.is_active,
+                is_blacklisted=user.is_blacklisted,
             )
 
     async def get_detailed_user(
@@ -54,7 +54,7 @@ class UserGateway(
     ) -> Optional[user_response.CurrentUser]:
         result = await self._session.execute(
             select(User)
-            .where(User.id == user_id, User.is_verified == True, User.is_active == True)
+            .where(User.id == user_id, User.is_verified == True, User.is_blacklisted == False)
             .options(selectinload(User.country), selectinload(User.region))
             .limit(1)
         )

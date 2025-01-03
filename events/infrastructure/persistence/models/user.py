@@ -14,11 +14,12 @@ class User(Base):
         Index("idx_users_region_id", "region_id"),
     )
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, )
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     bio: Mapped[str] = mapped_column(String(2048), nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_blacklisted: Mapped[bool] = mapped_column(Boolean, default=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     is_admin: Mapped[bool]  = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())

@@ -13,6 +13,6 @@ class UserDM:
     password: Optional[str] = None
     bio: Optional[str] = None
     is_verified: Optional[bool] = None
-    is_active: Optional[bool] = None
+    is_blacklisted: Optional[bool] = None
     country: Optional[CountryDM] = None
     region: Optional[RegionDM] = None

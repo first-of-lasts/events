@@ -16,6 +16,3 @@ def new_session_maker(database_uri) -> async_sessionmaker[AsyncSession]:
 @as_declarative(metadata=MetaData())
 class Base:
     __abstract__ = True
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, autoincrement=True
-    )

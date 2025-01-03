@@ -1,6 +1,7 @@
 import enum
 from datetime import datetime
-from sqlalchemy import Enum, ForeignKey, DateTime, func, UniqueConstraint
+from sqlalchemy import Enum, ForeignKey, DateTime, func, UniqueConstraint, \
+    Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from events.infrastructure.persistence.manager import Base
@@ -18,6 +19,7 @@ class Attendee(Base):
         UniqueConstraint("event_id", "user_id", name="uix_event_user"),
     )
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, )
     status: Mapped[AttendanceStatus] = mapped_column(
         Enum(AttendanceStatus),
         default=AttendanceStatus.pending,

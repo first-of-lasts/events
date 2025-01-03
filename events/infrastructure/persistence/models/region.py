@@ -8,6 +8,7 @@ from events.infrastructure.persistence.config import load_supported_languages
 class Region(Base):
     __tablename__ = "regions"
 
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, )
     for lang in load_supported_languages():
         locals()[f"name_{lang}"] = mapped_column(String(255), nullable=True)
     # Foreign Keys
