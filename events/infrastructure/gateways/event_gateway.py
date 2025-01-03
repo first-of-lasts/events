@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 
 from events.domain.models.event import EventDM
 from events.domain.exceptions.access import ActionPermissionError
-from events.domain.exceptions.event import EventNotFoundError
+from events.domain.exceptions.event import EventNotFoundError, EventCategoryNotFound
 from events.application.interfaces import event_interface
 from events.application.schemas.responses import event_response
 from events.infrastructure.persistence.models import Event, EventCategory
@@ -22,6 +22,15 @@ class EventGateway(
         self._session = session
 
     async def create_event(self, event: EventDM) -> None:
+        result = await self._session.execute(
+            select(EventCategory)
+            .where(
+                EventCategory.id.in_(event.category_ids)
+            )
+        )
+        categories = result.scalars().all()
+        if len(categories) != len(set(event.category_ids)):
+            raise EventCategoryNotFound("Некоторые категории не найдены.")
         new_event = Event(
             user_id=event.user_id,
             title=event.title,
@@ -30,6 +39,7 @@ class EventGateway(
             ends_at=event.ends_at,
             country_id=event.country_id,
             region_id=event.region_id,
+            categories=categories,
         )
         self._session.add(new_event)
         await self._session.commit()

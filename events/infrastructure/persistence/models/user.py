@@ -31,4 +31,4 @@ class User(Base):
     country = relationship(argument="Country", back_populates="users")
     region = relationship(argument="Region", back_populates="users")
     events = relationship(argument="Event", back_populates="creator")
-    attended_events = relationship(argument="Attendee", back_populates="attended_events")
+    # attended_events = relationship(argument="Attendee", back_populates="attended_events")

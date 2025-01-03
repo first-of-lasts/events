@@ -31,5 +31,5 @@ class Attendee(Base):
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id"), nullable=False)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     # Relationships
-    attendees = relationship(argument="Event", back_populates="attendees")
-    attended_events = relationship(argument="User", back_populates="attended_events")
+    # attendees = relationship(argument="Event", back_populates="attendees")
+    # attended_events = relationship(argument="User", back_populates="attended_events")

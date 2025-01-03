@@ -1,7 +1,7 @@
 from events.infrastructure.persistence.models.user import User
 from events.infrastructure.persistence.models.country import Country
 from events.infrastructure.persistence.models.region import Region
-from events.infrastructure.persistence.models.event import Event, EventCategory, EventEventCategory
+from events.infrastructure.persistence.models.event import Event, EventCategory
 from events.infrastructure.persistence.models.attendee import Attendee
 
 
@@ -11,6 +11,5 @@ __all__ = [
     "Region",
     "Event",
     "EventCategory",
-    "EventEventCategory",
     "Attendee",
 ]
